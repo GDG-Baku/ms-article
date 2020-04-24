@@ -1,1 +1,1 @@
-# ms-archetype
+# ms-article
