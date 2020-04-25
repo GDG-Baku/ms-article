@@ -29,6 +29,6 @@ public class ArticleEntity {
     private boolean isDraft;
     private boolean isApproved;
     private Integer approverId;
-    private List<TagEntity> tagIds;
+    private List<TagEntity> tags;
     private List<CommentDto> comments;
 }
