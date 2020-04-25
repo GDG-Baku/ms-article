@@ -1,6 +1,6 @@
 package az.gdg.msarticle.model.entity;
 
-import az.gdg.msarticle.model.dto.CommentDto;
+import az.gdg.msarticle.model.dto.CommentDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -30,5 +30,5 @@ public class ArticleEntity {
     private boolean isApproved;
     private Integer approverId;
     private List<TagEntity> tags;
-    private List<CommentDto> comments;
+    private List<CommentDTO> comments;
 }

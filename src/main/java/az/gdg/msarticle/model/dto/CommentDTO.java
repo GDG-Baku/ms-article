@@ -10,10 +10,11 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CommentDto {
-    private String index;
+public class CommentDTO {
     private String text;
-    private Integer userId;
+    private String firstName;
+    private String lastName;
+    private String imageUrl;
     private LocalDateTime createdAt;
-    private List<CommentDto> replies;
+    private List<CommentDTO> replies;
 }
