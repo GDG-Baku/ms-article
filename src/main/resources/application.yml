@@ -1,0 +1,20 @@
+server:
+  port: 8080
+logging:
+  level:
+    org:
+      springframework:
+        web: DEBUG
+spring:
+  data:
+    mongodb:
+      uri: ${MONGODB_URI}
+
+jwt:
+  secret: ${SECRET_KEY}
+  expiration: 9000
+  header: X-Auth-Token
+swagger:
+  enabled: true
+
+
