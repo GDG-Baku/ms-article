@@ -1,6 +1,5 @@
 package az.gdg.msarticle.model.entity;
 
-import az.gdg.msarticle.model.dto.CommentDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,6 +8,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 
@@ -29,6 +29,7 @@ public class ArticleEntity {
     private boolean isDraft;
     private boolean isApproved;
     private Integer approverId;
+    @DBRef
     private List<TagEntity> tags;
-    private List<CommentDTO> comments;
+    private List<Comment> comments;
 }
