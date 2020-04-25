@@ -2,12 +2,12 @@ package az.gdg.msarticle.service.impl;
 
 import az.gdg.msarticle.exception.ArticleNotFound;
 import az.gdg.msarticle.exception.NotValidTokenException;
-import az.gdg.msarticle.mapper.ArticleMapper;
-import az.gdg.msarticle.model.ArticleRequest;
 import az.gdg.msarticle.model.entity.ArticleEntity;
 import az.gdg.msarticle.repository.ArticleRepository;
 import az.gdg.msarticle.service.ArticleService;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class ArticleServiceImpl implements ArticleService {
 
+    private static final Logger logger = LoggerFactory.getLogger(ArticleServiceImpl.class);
     private final ArticleRepository articleRepository;
 
     public ArticleServiceImpl(ArticleRepository articleRepository) {
@@ -28,17 +29,18 @@ public class ArticleServiceImpl implements ArticleService {
         return SecurityContextHolder.getContext().getAuthentication();
     }
 
-    @Override
+    /*@Override
     public String createDraft(ArticleRequest articleRequest) {
         ArticleEntity articleEntity = ArticleMapper.INSTANCE.requestToEntity(articleRequest);
         articleEntity.setDraft(true);
         articleEntity.setUserId(31);
         articleRepository.save(articleEntity);
         return "Article is drafted";
-    }
+    }*/
 
     @Override
     public String publishArticle(String articleId) {
+        logger.info("ActionLog.publishArticle.start with articleId {}", articleId);
         String userId = (String) getAuthenticatedObject().getPrincipal();
         String message;
         ArticleEntity articleEntity = articleRepository.findById(articleId)
@@ -47,6 +49,7 @@ public class ArticleServiceImpl implements ArticleService {
         if (articleEntity.getUserId() == Integer.parseInt(userId)) {
             if (articleEntity.isDraft()) {
                 articleEntity.setDraft(false);
+                logger.info("ActionLog.publishArticle.success");
                 message = "Article is published now";
             } else {
                 message = "Article is already published";
@@ -54,6 +57,7 @@ public class ArticleServiceImpl implements ArticleService {
             articleRepository.save(articleEntity);
             return message;
         }
+        logger.info("ActionLog.publishArticle.end");
         return "You don't have permission for this";
     }
 }
