@@ -1,4 +1,4 @@
-package az.gdg.msarticle.model.Client.Auth;
+package az.gdg.msarticle.model.client.auth;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

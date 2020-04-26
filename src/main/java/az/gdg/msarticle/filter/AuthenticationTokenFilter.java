@@ -1,7 +1,8 @@
 package az.gdg.msarticle.filter;
 
-import az.gdg.msarticle.Client.AuthenticationClient;
-import az.gdg.msarticle.model.Client.Auth.UserInfo;
+import az.gdg.msarticle.client.AuthenticationClient;
+import az.gdg.msarticle.exception.NotValidException;
+import az.gdg.msarticle.model.client.auth.UserInfo;
 import az.gdg.msarticle.security.UserAuthentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -14,7 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-import static az.gdg.msarticle.model.Client.Auth.HttpHeader.X_AUTH_TOKEN;
+import static az.gdg.msarticle.model.client.auth.HttpHeader.X_AUTH_TOKEN;
 
 @Component
 public class AuthenticationTokenFilter extends OncePerRequestFilter {
@@ -33,7 +34,7 @@ public class AuthenticationTokenFilter extends OncePerRequestFilter {
             if (authToken != null) {
                 UserInfo userInfo = authenticationClient.validateToken(authToken);
                 if (userInfo == null) {
-                    throw new RuntimeException("User info is not valid");
+                    throw new NotValidException("User info is not valid");
                 } else {
                     UserAuthentication userAuthentication = new UserAuthentication(userInfo.getUserId(),
                             true,
