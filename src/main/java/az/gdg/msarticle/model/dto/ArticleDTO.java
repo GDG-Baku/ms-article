@@ -19,4 +19,5 @@ public class ArticleDTO {
     private LocalDateTime createdAt;
     private boolean isDraft;
     private List<TagDTO> tags;
+    private List<CommentDTO> comments;
 }
