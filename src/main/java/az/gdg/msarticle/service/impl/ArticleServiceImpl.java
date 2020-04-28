@@ -2,6 +2,7 @@ package az.gdg.msarticle.service.impl;
 
 import az.gdg.msarticle.exception.ArticleNotFound;
 import az.gdg.msarticle.exception.NotValidTokenException;
+import az.gdg.msarticle.mail.service.EmailService;
 import az.gdg.msarticle.model.entity.ArticleEntity;
 import az.gdg.msarticle.repository.ArticleRepository;
 import az.gdg.msarticle.service.ArticleService;
@@ -17,9 +18,11 @@ public class ArticleServiceImpl implements ArticleService {
 
     private static final Logger logger = LoggerFactory.getLogger(ArticleServiceImpl.class);
     private final ArticleRepository articleRepository;
+    private final EmailService emailService;
 
-    public ArticleServiceImpl(ArticleRepository articleRepository) {
+    public ArticleServiceImpl(ArticleRepository articleRepository, EmailService emailService) {
         this.articleRepository = articleRepository;
+        this.emailService = emailService;
     }
 
     private Authentication getAuthenticatedObject() {
@@ -48,9 +51,9 @@ public class ArticleServiceImpl implements ArticleService {
 
         if (articleEntity.getUserId() == Integer.parseInt(userId)) {
             if (articleEntity.isDraft()) {
-                articleEntity.setDraft(false);
+                sendMail(articleId);
                 logger.info("ActionLog.publishArticle.success");
-                message = "Article is published now";
+                message = "Article is sent for reviewing";
             } else {
                 message = "Article is already published";
             }
@@ -59,5 +62,13 @@ public class ArticleServiceImpl implements ArticleService {
         }
         logger.info("ActionLog.publishArticle.end");
         return "You don't have permission for this";
+    }
+
+
+    private void sendMail(String articleId) {
+
+        String mailBody = "Author that has article with id " + articleId + " wants to publish it.<br>" +
+                "Please review article before publishing";
+        emailService.sendToQueue(emailService.prepareMail(mailBody));
     }
 }
