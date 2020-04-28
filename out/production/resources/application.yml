@@ -1,0 +1,9 @@
+spring:
+  data:
+    mongodb:
+
+      uri: mongodb+srv://alihsoff:1WL8EVJzN03r9gyH@cluster0-0kudb.mongodb.net/blog?retryWrites=true&w=majority
+service:
+  ms-auth:
+    url: http://gdg-ms-auth.herokuapp.com
+
