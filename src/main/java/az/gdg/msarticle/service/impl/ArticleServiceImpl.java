@@ -33,7 +33,7 @@ public class ArticleServiceImpl implements ArticleService{
 
     @Override
     public UserArticleDTO getArticlesByUserId(int userId) {
-        logger.info("ActionLog.createMember.start with userId {}", userId);
+        logger.info("ActionLog.getArticlesByUserId.start with userId {}", userId);
         List<ArticleEntity> articleEntities;
         if(getAuthenticatedObject() != null &&
                 Integer.parseInt(getAuthenticatedObject().getPrincipal().toString()) == userId ) {
@@ -44,7 +44,7 @@ public class ArticleServiceImpl implements ArticleService{
         List<ArticleDTO> articleDTOs = ArticleMapper.INSTANCE.entityToDtoList(articleEntities);
         UserDTO userDTO = msAuthService.getUserById(userId);
 
-        logger.info("ActionLog.createMember.end with userId {}", userId);
+        logger.info("ActionLog.getArticlesByUserId.end with userId {}", userId);
         return UserArticleDTO.builder()
                 .articleDTOs(articleDTOs)
                 .firstName(userDTO.getFirstName())
