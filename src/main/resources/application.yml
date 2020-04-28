@@ -9,9 +9,9 @@ spring:
       uri: ${MONGODB_URI}
   rabbitmq:
     addresses: xxx
-    cloud:
-      stream:
-        bindings:
-          output:
-            destination: mail
-            group: mail-gorup
+  cloud:
+    stream:
+      bindings:
+        output:
+          destination: mail
+          group: mail-gorup
