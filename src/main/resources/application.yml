@@ -1,0 +1,9 @@
+spring:
+  data:
+    mongodb:
+
+      uri: ${MONGODB_URI}
+service:
+  ms-auth:
+    url: http://gdg-ms-auth.herokuapp.com
+
