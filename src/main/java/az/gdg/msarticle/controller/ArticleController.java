@@ -23,8 +23,8 @@ public class ArticleController {
     @ApiOperation("delete article")
     @DeleteMapping("/{articleId}")
     public void deleteArticleById (@RequestHeader(value = "X-Auth-Token") String token,
-                                             @PathVariable("articleId") String articleId){
-        logger.debug("delete articles by articleId {} start", articleId);
+                                   @PathVariable("articleId") String articleId) {
+        logger.debug("delete article by articleId {} start", articleId);
         articleService.deleteArticleById(articleId);
     }
 }
