@@ -15,7 +15,7 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Document(collection = "comment")
+@Document(collection = "comments")
 public class CommentEntity {
     @Id
     private String id;

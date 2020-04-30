@@ -37,7 +37,7 @@ public class ArticleServiceImpl implements ArticleService{
 
     @Override
     public UserArticleDTO getArticleById(String articleId) {
-        logger.info("ActionLog.getArticlesByUserId.start with id {}", articleId);
+        logger.info("ActionLog.getArticleById.start with id {}", articleId);
         ArticleEntity articleEntity = articleRepository.findById(articleId)
                 .orElseThrow(() -> new NoSuchArticleException("Article doesn't exist"));
         int userId = articleEntity.getUserId();
@@ -50,7 +50,7 @@ public class ArticleServiceImpl implements ArticleService{
         ArticleDTO articleDTO = ArticleMapper.INSTANCE.entityToDto(articleEntity);
         articleDTO.setComments(commentMapper.mapEntityListToDtoList(articleEntity.getComments()));
         UserDTO userDTO = msAuthService.getUserById(userId);
-        logger.info("ActionLog.getArticlesByUserId.end with id {}", articleId);
+        logger.info("ActionLog.getArticleById.end with id {}", articleId);
         return UserArticleDTO.builder()
                 .articleDTOs(Collections.singletonList(articleDTO))
                 .firstName(userDTO.getFirstName())

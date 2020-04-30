@@ -23,6 +23,7 @@ public class CommentMapper {
                 .firstName(userDTO.getFirstName())
                 .lastName(userDTO.getLastName())
                 .imageUrl(userDTO.getImageUrl())
+                .userId(commentEntity.getUserId())
                 .text(commentEntity.getText())
                 .createdAt(commentEntity.getCreatedAt())
                 .replies(mapEntityListToDtoList(commentEntity.getReplies()))
