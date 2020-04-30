@@ -36,7 +36,7 @@ public class ArticleServiceImpl implements ArticleService{
 
 
     @Override
-    public UserArticleDTO getArticlesByUserId(String articleId) {
+    public UserArticleDTO getArticleById(String articleId) {
         logger.info("ActionLog.getArticlesByUserId.start with id {}", articleId);
         ArticleEntity articleEntity = articleRepository.findById(articleId)
                 .orElseThrow(() -> new NoSuchArticleException("Article doesn't exist"));

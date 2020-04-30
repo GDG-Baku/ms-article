@@ -22,8 +22,8 @@ public class ArticleController {
 
     @GetMapping("/{articleId}")
     public UserArticleDTO getArticleById (@RequestHeader(value = "X-Auth-Token", required = false) String token,
-                                               @PathVariable("articleId") String articleId){
+                                          @PathVariable("articleId") String articleId) {
         logger.debug("Get articles by id {} start", articleId);
-        return articleService.getArticlesByUserId(articleId);
+        return articleService.getArticleById(articleId);
     }
 }

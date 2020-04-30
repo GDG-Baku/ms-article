@@ -4,6 +4,6 @@ import az.gdg.msarticle.model.dto.UserArticleDTO;
 
 public interface ArticleService {
 
-    UserArticleDTO getArticlesByUserId(String articleId);
+    UserArticleDTO getArticleById(String articleId);
 
 }
