@@ -15,5 +15,4 @@ public class ArticleRequest {
     private Integer clapCount;
     private Integer readCount;
     private List<TagRequest> tags;
-    private List<CommentRequest> comments;
 }

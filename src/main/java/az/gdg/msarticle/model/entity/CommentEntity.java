@@ -5,18 +5,27 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Comment {
+@Document(collection = "comments")
+public class CommentEntity {
     @Id
     private String id;
-    private String articleId;
     private String text;
     private Integer userId;
-    private String parentCommentId;
+    private boolean isReply;
+
+    @DBRef
+    private List<CommentEntity> replies;
+
+    @CreatedDate
     private LocalDateTime createdAt;
 }
