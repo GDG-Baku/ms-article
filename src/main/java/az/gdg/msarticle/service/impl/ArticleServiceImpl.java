@@ -6,7 +6,6 @@ import az.gdg.msarticle.model.dto.UserArticleDTO;
 import az.gdg.msarticle.model.dto.UserDTO;
 import az.gdg.msarticle.model.entity.ArticleEntity;
 import az.gdg.msarticle.repository.ArticleRepository;
-import az.gdg.msarticle.repository.TagRepository;
 import az.gdg.msarticle.service.ArticleService;
 import az.gdg.msarticle.service.MsAuthService;
 import org.slf4j.Logger;
@@ -24,8 +23,7 @@ public class ArticleServiceImpl implements ArticleService{
     private final MsAuthService msAuthService;
 
 
-    public ArticleServiceImpl(ArticleRepository articleRepository, MsAuthService msAuthService,
-                              TagRepository tagRepository) {
+    public ArticleServiceImpl(ArticleRepository articleRepository, MsAuthService msAuthService) {
         this.articleRepository = articleRepository;
         this.msAuthService = msAuthService;
     }
