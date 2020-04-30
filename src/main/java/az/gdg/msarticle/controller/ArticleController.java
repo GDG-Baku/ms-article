@@ -24,12 +24,12 @@ public class ArticleController {
     private static final Logger logger = LoggerFactory.getLogger(ArticleController.class);
     private final ArticleService articleService;
 
-    @PostMapping(value = "/addDraft")
+    @PostMapping(value = "/add-draft")
     @ApiOperation("add draft article to database")
     public String addDraft(@RequestBody ArticleRequest articleRequest,
                            @RequestHeader("X-Auth-Token") String token) {
 
-        logger.debug("AddDraftArticle start");
+        logger.debug("addDraft start");
         return articleService.addDraft(token, articleRequest);
     }
 }

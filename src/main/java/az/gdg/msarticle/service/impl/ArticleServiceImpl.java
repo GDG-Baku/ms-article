@@ -34,20 +34,19 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     public String addDraft(String token, ArticleRequest articleRequest) {
-        logger.info("ActionLog.AddDraftArticle.Start : token {}", token);
+        logger.info("ActionLog.addDraft.Start : token {}", token);
         String userId = (String) getAuthenticatedObject().getPrincipal();
-
 
         ArticleEntity draft = ArticleMapper.INSTANCE.requestToEntity(articleRequest);
         draft.setUserId(Integer.parseInt(userId));
         draft.setDraft(true);
         draft.setApproved(false);
         draft.setApproverId(null);
-
+        draft.setComments(null);
         tagRepository.saveAll(draft.getTags());
         articleRepository.save(draft);
 
-        logger.info("ActionLog.AddDraftArticle.Stop.Success");
+        logger.info("ActionLog.addDraft.Stop.Success");
 
         return draft.getId();
 
