@@ -44,6 +44,7 @@ public class ArticleServiceImpl implements ArticleService{
 
         if(articleEntity.isDraft() && !(getAuthenticatedObject() != null &&
                 Integer.parseInt(getAuthenticatedObject().getPrincipal().toString()) == userId) ) {
+            logger.info("Thrown.NoAccessException");
             throw new NoAccessException("You don't have permission to get the article");
         }
         ArticleDTO articleDTO = ArticleMapper.INSTANCE.entityToDto(articleEntity);
@@ -57,6 +58,7 @@ public class ArticleServiceImpl implements ArticleService{
                 .imageUrl(userDTO.getImageUrl())
                 .build();
     }
+
 
     private Authentication getAuthenticatedObject() {
         return SecurityContextHolder.getContext().getAuthentication();

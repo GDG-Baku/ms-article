@@ -16,7 +16,7 @@ public interface ArticleMapper {
 
     ArticleEntity dtoToEntity(ArticleDTO articleDTO);
 
-    @Mapping(target = "comments", ignore = true)
+    @Mapping(target = "commentEntities", ignore = true)
     ArticleDTO entityToDto(ArticleEntity articleEntity);
 
     List<ArticleDTO> entityToDtoList(List<ArticleEntity> articleEntities);

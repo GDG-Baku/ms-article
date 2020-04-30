@@ -2,7 +2,7 @@ package az.gdg.msarticle.mapper;
 
 import az.gdg.msarticle.model.dto.CommentDTO;
 import az.gdg.msarticle.model.dto.UserDTO;
-import az.gdg.msarticle.model.entity.Comment;
+import az.gdg.msarticle.model.entity.CommentEntity;
 import az.gdg.msarticle.service.MsAuthService;
 import org.springframework.stereotype.Component;
 
@@ -17,21 +17,24 @@ public class CommentMapper {
         this.msAuthService = msAuthService;
     }
 
-    public CommentDTO mapEntityToDto(Comment comment){
-        UserDTO userDTO = msAuthService.getUserById(comment.getUserId());
+    public CommentDTO mapEntityToDto(CommentEntity commentEntity) {
+        UserDTO userDTO = msAuthService.getUserById(commentEntity.getUserId());
         return CommentDTO.builder()
                 .firstName(userDTO.getFirstName())
                 .lastName(userDTO.getLastName())
                 .imageUrl(userDTO.getImageUrl())
-                .text(comment.getText())
-                .createdAt(comment.getCreatedAt())
-                .replies(comment.getReplies())
+                .text(commentEntity.getText())
+                .createdAt(commentEntity.getCreatedAt())
+                .replies(mapEntityListToDtoList(commentEntity.getReplies()))
                 .build();
     }
 
-    public List<CommentDTO> mapEntityListToDtoList(List<Comment> comments){
-        return comments.stream()
-                .map(this::mapEntityToDto)
-                .collect(Collectors.toList());
+    public List<CommentDTO> mapEntityListToDtoList(List<CommentEntity> commentEntities) {
+        if (commentEntities != null) {
+            return commentEntities.stream()
+                    .map(this::mapEntityToDto)
+                    .collect(Collectors.toList());
+        }
+        return null;
     }
 }
