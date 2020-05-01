@@ -24,12 +24,6 @@ public class ArticleController {
         this.articleService = articleService;
     }
 
-    /* @PostMapping
-    public ResponseEntity<String> createDraft(@RequestBody ArticleRequest articleRequest) {
-        return new ResponseEntity<>(articleService.createDraft(articleRequest), HttpStatus.OK);
-    }*/
-
-
     @ApiOperation(value = "Publish article method")
     @CrossOrigin(exposedHeaders = "Access-Control-Allow-Origin")
     @PutMapping("{articleId}")

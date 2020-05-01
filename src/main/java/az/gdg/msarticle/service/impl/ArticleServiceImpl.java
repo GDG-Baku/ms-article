@@ -32,15 +32,6 @@ public class ArticleServiceImpl implements ArticleService {
         return SecurityContextHolder.getContext().getAuthentication();
     }
 
-    /*@Override
-    public String createDraft(ArticleRequest articleRequest) {
-        ArticleEntity articleEntity = ArticleMapper.INSTANCE.requestToEntity(articleRequest);
-        articleEntity.setDraft(true);
-        articleEntity.setUserId(31);
-        articleRepository.save(articleEntity);
-        return "Article is drafted";
-    }*/
-
     @Override
     public String publishArticle(String articleId) {
         logger.info("ActionLog.publishArticle.start with articleId {}", articleId);
