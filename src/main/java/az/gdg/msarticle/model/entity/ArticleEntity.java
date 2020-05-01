@@ -37,5 +37,6 @@ public class ArticleEntity {
     private Integer approverId;
     @DBRef
     private List<TagEntity> tags;
+    @DBRef
     private List<CommentEntity> comments;
 }

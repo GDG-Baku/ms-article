@@ -13,6 +13,9 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class CommentDTO {
+
+    private String id;
+    private Integer userId;
     private String firstName;
     private String lastName;
     private String imageUrl;
