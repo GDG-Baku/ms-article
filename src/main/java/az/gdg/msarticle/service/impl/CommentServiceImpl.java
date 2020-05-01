@@ -6,12 +6,15 @@ import az.gdg.msarticle.model.entity.CommentEntity;
 import az.gdg.msarticle.repository.CommentRepository;
 import az.gdg.msarticle.service.CommentService;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 @Service
 public class CommentServiceImpl implements CommentService {
+    private static final Logger logger = LoggerFactory.getLogger(CommentServiceImpl.class);
     private final CommentRepository commentRepository;
     private static final String NO_ACCESS_TO_REQUEST = "You don't have access for this request";
 
@@ -28,10 +31,11 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public String deleteComment(String id) {
+        logger.info("ActionLog.deleteComment.start with id {}", id);
         String message;
 
         String userId = (String) getAuthenticatedObject().getPrincipal();
-        
+
         CommentEntity commentEntity = commentRepository.findById(id).orElseThrow(() ->
                 new CommentNotFoundException("Comment doesn't exist with this id " + id));
 
@@ -40,10 +44,12 @@ public class CommentServiceImpl implements CommentService {
                 commentRepository.deleteAll(commentEntity.getReplies());
             }
             commentRepository.deleteById(id);
+            logger.info("ActionLog.deleteComment.success with id {}", id);
             message = "Comment is deleted";
         } else {
             message = NO_ACCESS_TO_REQUEST;
         }
+        logger.info("ActionLog.deleteComment.end with id {}", id);
         return message;
     }
 }

@@ -1,9 +1,13 @@
 package az.gdg.msarticle.controller;
 
 import az.gdg.msarticle.service.CommentService;
+import io.swagger.annotations.ApiOperation;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -13,15 +17,19 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/comments")
 public class CommentController {
+    private static final Logger logger = LoggerFactory.getLogger(CommentController.class);
     private final CommentService commentService;
 
     public CommentController(CommentService commentService) {
         this.commentService = commentService;
     }
 
+    @ApiOperation(value = "Deleting comment by id")
+    @CrossOrigin(exposedHeaders = "Access-Control-Allow-Origin")
     @DeleteMapping("{id}")
     public ResponseEntity<String> deleteComment(@RequestHeader("X-Auth-Token") String token,
                                                 @PathVariable String id) {
+        logger.debug("Delete comment method start");
         return new ResponseEntity<>(commentService.deleteComment(id), HttpStatus.OK);
     }
 }
