@@ -16,7 +16,7 @@ public class ArticleRequest {
 
     private String title;
     private String content;
-    private Integer clapCount;
+    private Integer quackCount;
     private Integer readCount;
     private List<TagDTO> tags;
 }
