@@ -1,5 +1,6 @@
 package az.gdg.msarticle.service.impl;
 
+import az.gdg.msarticle.client.MsAuthClient;
 import az.gdg.msarticle.exception.ArticleNotFoundException;
 import az.gdg.msarticle.model.entity.ArticleEntity;
 import az.gdg.msarticle.repository.ArticleRepository;
@@ -15,9 +16,11 @@ public class ArticleServiceImpl implements ArticleService {
 
     private static final Logger logger = LoggerFactory.getLogger(ArticleServiceImpl.class);
     private final ArticleRepository articleRepository;
+    private final MsAuthClient msAuthClient;
 
-    public ArticleServiceImpl(ArticleRepository articleRepository) {
+    public ArticleServiceImpl(ArticleRepository articleRepository, MsAuthClient msAuthClient) {
         this.articleRepository = articleRepository;
+        this.msAuthClient = msAuthClient;
     }
 
 
@@ -28,9 +31,12 @@ public class ArticleServiceImpl implements ArticleService {
 
         if (articleEntity.isPresent()) {
             ArticleEntity article = articleEntity.get();
+
+            Integer userId = article.getUserId();
             Integer count = article.getReadCount();
             article.setReadCount(count + 1);
 
+            msAuthClient.addPopularity(userId);
             articleRepository.save(article);
         } else {
             logger.info("Thrown.ArticleNotFoundException");

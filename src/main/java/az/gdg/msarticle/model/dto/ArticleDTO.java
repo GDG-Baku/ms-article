@@ -22,7 +22,7 @@ public class ArticleDTO {
     private String title;
     private String content;
     private LocalDateTime createdAt;
-    private Integer clapCount;
+    private Integer quackCount;
     private Integer readCount;
     private boolean isDraft;
     private List<TagDTO> tags;

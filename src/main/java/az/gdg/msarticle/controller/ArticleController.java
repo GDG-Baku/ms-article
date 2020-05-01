@@ -22,9 +22,9 @@ public class ArticleController {
 
     @ApiOperation("add read count for article which is defined by id")
     @PostMapping(value = "/read-count")
-    public void addReadCount(@RequestBody String id) {
-        logger.debug("Add read count start : articleId {}", id);
-        articleService.addReadCount(id);
+    public void addReadCount(@RequestBody String articleId) {
+        logger.debug("Add read count start : articleId {}", articleId);
+        articleService.addReadCount(articleId);
     }
 
 }
