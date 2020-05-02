@@ -37,7 +37,8 @@ public class ArticleServiceImpl implements ArticleService{
                 Integer.parseInt(getAuthenticatedObject().getPrincipal().toString()) == userId ) {
             articleEntities = articleRepository.getArticleEntitiesByUserId(userId);
         } else{
-            articleEntities = articleRepository.getArticleEntitiesByUserIdAndIsDraft(userId, false);
+            articleEntities = articleRepository.
+                    getArticleEntitiesByUserIdAndIsDraftAndIsApproved(userId, false, true);
         }
         List<ArticleDTO> articleDTOs = ArticleMapper.INSTANCE.entityToDtoList(articleEntities);
         UserDTO userDTO = msAuthService.getUserById(userId);

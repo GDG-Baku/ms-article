@@ -11,5 +11,6 @@ public interface ArticleRepository extends MongoRepository<ArticleEntity,String>
 
     List<ArticleEntity> getArticleEntitiesByUserId(Integer userId);
 
-    List<ArticleEntity> getArticleEntitiesByUserIdAndIsDraft(Integer userId, boolean isDraft);
+    List<ArticleEntity> getArticleEntitiesByUserIdAndIsDraftAndIsApproved(Integer userId, boolean isDraft,
+                                                                          boolean isApproved);
 }
