@@ -31,7 +31,7 @@ public class ArticleEntity {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
-    private Integer clapCount;
+    private Integer quackCount;
     private Integer readCount;
     private boolean isDraft;
     private boolean isApproved;
