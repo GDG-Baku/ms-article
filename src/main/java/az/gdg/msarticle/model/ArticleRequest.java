@@ -12,7 +12,5 @@ import java.util.List;
 public class ArticleRequest {
     private String title;
     private String content;
-    private Integer quackCount;
-    private Integer readCount;
     private List<TagRequest> tags;
 }

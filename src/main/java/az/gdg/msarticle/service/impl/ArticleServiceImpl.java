@@ -42,13 +42,12 @@ public class ArticleServiceImpl implements ArticleService {
 
         if (articleEntity.getUserId() == Integer.parseInt(userId)) {
             if (articleEntity.isDraft()) {
-                sendMail(articleId);
+                sendMail(articleId, "publish");
                 logger.info("ActionLog.publishArticle.success");
                 message = "Article is sent for reviewing";
             } else {
                 message = "Article is already published";
             }
-            articleRepository.save(articleEntity);
             return message;
         }
         logger.info("ActionLog.publishArticle.end");
@@ -56,10 +55,11 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
 
-    private void sendMail(String articleId) {
-
-        String mailBody = "Author that has article with id " + articleId + " wants to publish it.<br>" +
-                "Please review article before publishing";
+    private void sendMail(String articleId, String requestType) {
+        logger.info("ActionLog.sendMail.start");
+        String mailBody = "Author that has article with id " + articleId + " wants to " + requestType + " it.<br>" +
+                "Please review article before " + requestType;
         emailService.sendToQueue(emailService.prepareMail(mailBody));
+        logger.info("ActionLog.sendMail.end");
     }
 }
