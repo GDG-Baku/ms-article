@@ -2,11 +2,13 @@ package az.gdg.msarticle.controller;
 
 import az.gdg.msarticle.model.ArticleRequest;
 import az.gdg.msarticle.service.ArticleService;
+import io.swagger.annotations.ApiOperation;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,6 +26,8 @@ public class ArticleController {
         this.articleService = articleService;
     }
 
+    @ApiOperation(value = "Update article method")
+    @CrossOrigin(exposedHeaders = "Access-Control-Allow-Origin")
     @PutMapping("{articleId}")
     public ResponseEntity<String> updateArticle(@RequestHeader("X-Auth-Token") String token,
                                                 @PathVariable String articleId,
