@@ -15,12 +15,15 @@ import az.gdg.msarticle.service.ArticleService;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 @Service
 public class ArticleServiceImpl implements ArticleService {
+    private static final Logger logger = LoggerFactory.getLogger(ArticleServiceImpl.class);
     private final ArticleRepository articleRepository;
     private final TagRepository tagRepository;
     private final EmailService emailService;
@@ -34,6 +37,7 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     public String updateArticle(String articleId, ArticleRequest articleRequest) {
+        logger.info("ActionLog.updateArticle.start with id {}", articleId);
         String userId = (String) getAuthenticatedObject().getPrincipal();
 
         ArticleEntity articleEntity = articleRepository.findById(articleId).orElseThrow(() ->
@@ -50,13 +54,16 @@ public class ArticleServiceImpl implements ArticleService {
             articleRepository.save(articleEntity);
             sendMail(articleId, "update");
             message = "Article is sent for reviewing";
+            logger.info("ActionLog.updateArticle.success with id {}", articleId);
         } else {
             message = NO_ACCESS_TO_REQUEST;
         }
+        logger.info("ActionLog.updateArticle.end with id {}", articleId);
         return message;
     }
 
     private List<TagEntity> getTagsFromRequest(List<TagRequest> tagRequests) {
+        logger.info("ActionLog.getTagsFromRequest.start");
         List<TagEntity> tags = new ArrayList<>();
         for (TagRequest tagRequest : tagRequests) {
             TagEntity tagEntity = tagRepository.findByName(tagRequest.getName());
@@ -65,13 +72,16 @@ public class ArticleServiceImpl implements ArticleService {
             }
             tags.add(tagEntity);
         }
+        logger.info("ActionLog.getTagsFromRequest.end");
         return tags;
     }
 
     private void sendMail(String articleId, String requestType) {
+        logger.info("ActionLog.sendMail.start");
         String mailBody = "Author that has article with id " + articleId + " wants to " + requestType + " it.<br>" +
                 "Please review article before " + requestType;
         emailService.sendToQueue(emailService.prepareMail(mailBody));
+        logger.info("ActionLog.sendMail.end");
     }
 
     private Authentication getAuthenticatedObject() {
