@@ -1,6 +1,6 @@
 package az.gdg.msarticle.service.impl;
 
-import az.gdg.msarticle.exception.ArticleNotFound;
+import az.gdg.msarticle.exception.ArticleNotFoundException;
 import az.gdg.msarticle.exception.NotValidTokenException;
 import az.gdg.msarticle.mail.service.EmailService;
 import az.gdg.msarticle.model.entity.ArticleEntity;
@@ -38,7 +38,7 @@ public class ArticleServiceImpl implements ArticleService {
         String userId = (String) getAuthenticatedObject().getPrincipal();
         String message;
         ArticleEntity articleEntity = articleRepository.findById(articleId)
-                .orElseThrow(() -> new ArticleNotFound("Article doesn't exist with this id" + articleId));
+                .orElseThrow(() -> new ArticleNotFoundException("Article doesn't exist with this id" + articleId));
 
         if (articleEntity.getUserId() == Integer.parseInt(userId)) {
             if (articleEntity.isDraft()) {
