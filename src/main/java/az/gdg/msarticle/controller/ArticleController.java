@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -22,7 +23,8 @@ public class ArticleController {
     }
 
     @PutMapping("{articleId}")
-    public ResponseEntity<String> updateArticle(@PathVariable String articleId,
+    public ResponseEntity<String> updateArticle(@RequestHeader("X-Auth-Token") String token,
+                                                @PathVariable String articleId,
                                                 @RequestBody ArticleRequest articleRequest) {
         return new ResponseEntity<>(articleService.updateArticle(articleId, articleRequest), HttpStatus.OK);
     }
