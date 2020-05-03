@@ -1,6 +1,7 @@
 package az.gdg.msarticle.service.impl;
 
 import az.gdg.msarticle.exception.ArticleNotFoundException;
+import az.gdg.msarticle.mail.service.EmailService;
 import az.gdg.msarticle.mapper.TagMapper;
 import az.gdg.msarticle.model.ArticleRequest;
 import az.gdg.msarticle.model.TagRequest;
@@ -19,10 +20,12 @@ import org.springframework.stereotype.Service;
 public class ArticleServiceImpl implements ArticleService {
     private final ArticleRepository articleRepository;
     private final TagRepository tagRepository;
+    private final EmailService emailService;
 
-    public ArticleServiceImpl(ArticleRepository articleRepository, TagRepository tagRepository) {
+    public ArticleServiceImpl(ArticleRepository articleRepository, TagRepository tagRepository, EmailService emailService) {
         this.articleRepository = articleRepository;
         this.tagRepository = tagRepository;
+        this.emailService = emailService;
     }
 
     @Override
@@ -38,7 +41,7 @@ public class ArticleServiceImpl implements ArticleService {
         articleEntity.setDraft(true);
 
         articleRepository.save(articleEntity);
-
+        sendMail(articleId, "update");
         return "Article is updated";
     }
 
@@ -52,5 +55,11 @@ public class ArticleServiceImpl implements ArticleService {
             tags.add(tagEntity);
         }
         return tags;
+    }
+
+    private void sendMail(String articleId, String requestType) {
+        String mailBody = "Author that has article with id " + articleId + " wants to " + requestType + " it.<br>" +
+                "Please review article before " + requestType;
+        emailService.sendToQueue(emailService.prepareMail(mailBody));
     }
 }
