@@ -44,14 +44,12 @@ public class ArticleServiceImpl implements ArticleService {
         if (articleEntity.getUserId() == Integer.parseInt(userId)) {
             articleEntity.setTitle(articleRequest.getTitle());
             articleEntity.setContent(articleRequest.getContent());
-            articleEntity.setQuackCount(articleRequest.getQuackCount());
-            articleEntity.setReadCount(articleRequest.getReadCount());
             articleEntity.setTags(getTagsFromRequest(articleRequest.getTags()));
             articleEntity.setDraft(true);
 
             articleRepository.save(articleEntity);
             sendMail(articleId, "update");
-            message = "Article is updated";
+            message = "Article is sent for reviewing";
         } else {
             message = NO_ACCESS_TO_REQUEST;
         }
