@@ -40,6 +40,9 @@ public class ArticleServiceImpl implements ArticleService {
         ArticleEntity draft = ArticleMapper.INSTANCE.requestToEntity(articleRequest);
         draft.setUserId(Integer.parseInt(userId));
         draft.setDraft(true);
+        draft.setReadCount(0);
+        draft.setHateCount(0);
+        draft.setQuackCount(0);
         draft.setApproved(false);
         draft.setApproverId(null);
         draft.setComments(null);
