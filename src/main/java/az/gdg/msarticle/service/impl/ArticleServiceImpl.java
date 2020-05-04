@@ -26,7 +26,7 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     public void addReadCount(String articleId) {
-        logger.info("ActionLog.add read count.start : articleId {}", articleId);
+        logger.info("ActionLog.addReadCount.start : articleId {}", articleId);
         Optional<ArticleEntity> articleEntity = articleRepository.findById(articleId);
 
         if (articleEntity.isPresent()) {
@@ -43,6 +43,6 @@ public class ArticleServiceImpl implements ArticleService {
             throw new ArticleNotFoundException("No found such article");
         }
 
-        logger.info("ActionLog.add read count.stop.success");
+        logger.info("ActionLog.addReadCount.stop.success");
     }
 }

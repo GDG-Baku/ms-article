@@ -17,7 +17,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Document(collection = "article")
+@Document(collection = "articles")
 public class ArticleEntity {
     @Id
     private String id;
@@ -31,6 +31,7 @@ public class ArticleEntity {
     @LastModifiedDate
     private LocalDateTime updatedAt;
     private Integer quackCount;
+    private Integer hateCount;
     private Integer readCount;
     private boolean isDraft;
     private boolean isApproved;
