@@ -19,6 +19,7 @@ public class ArticleDTO {
     private String content;
     private LocalDateTime createdAt;
     private Integer quackCount;
+    private Integer hateCount;
     private Integer readCount;
     private boolean isDraft;
     private List<TagDTO> tags;
