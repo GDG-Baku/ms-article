@@ -18,7 +18,7 @@ public class CommentMapper {
         this.msAuthService = msAuthService;
     }
 
-    public CommentDTO mapEntityToDto(CommentEntity commentEntity) {
+    private CommentDTO mapEntityToDto(CommentEntity commentEntity) {
         UserDTO userDTO = msAuthService.getUserById(commentEntity.getUserId());
         return CommentDTO.builder()
                 .firstName(userDTO.getFirstName())
@@ -32,7 +32,7 @@ public class CommentMapper {
     }
 
     public List<CommentDTO> mapEntityListToDtoList(List<CommentEntity> commentEntities) {
-        if (commentEntities.size() != 0) {
+        if (commentEntities != null && !commentEntities.isEmpty()) {
             return commentEntities.stream()
                     .map(this::mapEntityToDto)
                     .collect(Collectors.toList());
