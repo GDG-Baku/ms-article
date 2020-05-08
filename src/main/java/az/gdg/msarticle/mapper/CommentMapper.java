@@ -6,6 +6,7 @@ import az.gdg.msarticle.model.entity.CommentEntity;
 import az.gdg.msarticle.service.MsAuthService;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,11 +32,11 @@ public class CommentMapper {
     }
 
     public List<CommentDTO> mapEntityListToDtoList(List<CommentEntity> commentEntities) {
-        if (commentEntities != null) {
+        if (commentEntities.size() != 0) {
             return commentEntities.stream()
                     .map(this::mapEntityToDto)
                     .collect(Collectors.toList());
         }
-        return null;
+        return Collections.emptyList();
     }
 }
