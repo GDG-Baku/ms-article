@@ -5,7 +5,6 @@ import az.gdg.msarticle.exception.NoSuchArticleException;
 import az.gdg.msarticle.mapper.ArticleMapper;
 import az.gdg.msarticle.mapper.CommentMapper;
 import az.gdg.msarticle.model.dto.ArticleDTO;
-import az.gdg.msarticle.model.dto.UserArticleDTO;
 import az.gdg.msarticle.model.dto.UserDTO;
 import az.gdg.msarticle.model.entity.ArticleEntity;
 import az.gdg.msarticle.repository.ArticleRepository;
@@ -17,7 +16,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 
 @Service
 public class ArticleServiceImpl implements ArticleService{
@@ -36,7 +34,7 @@ public class ArticleServiceImpl implements ArticleService{
 
 
     @Override
-    public UserArticleDTO getArticleById(String articleId) {
+    public ArticleDTO getArticleById(String articleId) {
         logger.info("ActionLog.getArticleById.start with id {}", articleId);
         ArticleEntity articleEntity = articleRepository.findById(articleId)
                 .orElseThrow(() -> new NoSuchArticleException("Article doesn't exist"));
@@ -49,19 +47,20 @@ public class ArticleServiceImpl implements ArticleService{
         }
         ArticleDTO articleDTO = ArticleMapper.INSTANCE.entityToDto(articleEntity);
         articleDTO.setComments(commentMapper.mapEntityListToDtoList(articleEntity.getComments()));
+
         UserDTO userDTO = msAuthService.getUserById(userId);
+        articleDTO.setFirstName(userDTO.getFirstName());
+        articleDTO.setLastName(userDTO.getLastName());
+        articleDTO.setImageUrl(userDTO.getImageUrl());
+
         logger.info("ActionLog.getArticleById.end with id {}", articleId);
-        return UserArticleDTO.builder()
-                .articleDTOs(Collections.singletonList(articleDTO))
-                .firstName(userDTO.getFirstName())
-                .lastName(userDTO.getLastName())
-                .imageUrl(userDTO.getImageUrl())
-                .build();
+        return articleDTO;
     }
 
 
     private Authentication getAuthenticatedObject() {
         return SecurityContextHolder.getContext().getAuthentication();
     }
+
 
 }

@@ -1,6 +1,6 @@
 package az.gdg.msarticle.controller;
 
-import az.gdg.msarticle.model.dto.UserArticleDTO;
+import az.gdg.msarticle.model.dto.ArticleDTO;
 import az.gdg.msarticle.service.ArticleService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,8 +21,8 @@ public class ArticleController {
     }
 
     @GetMapping("/{articleId}")
-    public UserArticleDTO getArticleById (@RequestHeader(value = "X-Auth-Token", required = false) String token,
-                                          @PathVariable("articleId") String articleId) {
+    public ArticleDTO getArticleById(@RequestHeader(value = "X-Auth-Token", required = false) String token,
+                                     @PathVariable("articleId") String articleId) {
         logger.debug("Get article by id {} start", articleId);
         return articleService.getArticleById(articleId);
     }

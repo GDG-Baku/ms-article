@@ -1,9 +1,9 @@
 package az.gdg.msarticle.service;
 
-import az.gdg.msarticle.model.dto.UserArticleDTO;
+import az.gdg.msarticle.model.dto.ArticleDTO;
 
 public interface ArticleService {
 
-    UserArticleDTO getArticleById(String articleId);
+    ArticleDTO getArticleById(String articleId);
 
 }
