@@ -19,8 +19,8 @@ public interface ArticleMapper {
 
     ArticleEntity dtoToEntity(ArticleDTO articleDTO);
 
-    @Named("getTypeOfValye")
-    static String getTypeOfValye(Integer type) {
+    @Named("getTypeOfValue")
+    static String getTypeOfValue(Integer type) {
         for (TypeEnum typeEnum : TypeEnum.values()) {
             if (typeEnum.getValue() == type) {
                 return typeEnum.name();
@@ -32,6 +32,6 @@ public interface ArticleMapper {
     List<ArticleDTO> entityToDtoList(List<ArticleEntity> articleEntities);
 
     @Mapping(target = "comments", ignore = true)
-    @Mapping(source = "type", target = "type", qualifiedByName = "getTypeOfValye")
+    @Mapping(source = "type", target = "type", qualifiedByName = "getTypeOfValue")
     ArticleDTO entityToDto(ArticleEntity articleEntity);
 }
