@@ -3,6 +3,7 @@ package az.gdg.msarticle.service.impl;
 import az.gdg.msarticle.exception.ArticleNotFoundException;
 import az.gdg.msarticle.exception.InvalidTokenException;
 import az.gdg.msarticle.mail.service.EmailService;
+import az.gdg.msarticle.mapper.ArticleMapper;
 import az.gdg.msarticle.mapper.TagMapper;
 import az.gdg.msarticle.model.ArticleRequest;
 import az.gdg.msarticle.model.TagRequest;
@@ -29,7 +30,9 @@ public class ArticleServiceImpl implements ArticleService {
     private final EmailService emailService;
     private static final String NO_ACCESS_TO_REQUEST = "You don't have access for this request";
 
-    public ArticleServiceImpl(ArticleRepository articleRepository, TagRepository tagRepository, EmailService emailService) {
+    public ArticleServiceImpl(ArticleRepository articleRepository,
+                              TagRepository tagRepository,
+                              EmailService emailService) {
         this.articleRepository = articleRepository;
         this.tagRepository = tagRepository;
         this.emailService = emailService;
@@ -46,11 +49,9 @@ public class ArticleServiceImpl implements ArticleService {
         String message;
 
         if (articleEntity.getUserId() == Integer.parseInt(userId)) {
-            articleEntity.setTitle(articleRequest.getTitle());
-            articleEntity.setContent(articleRequest.getContent());
+            articleEntity = ArticleMapper.INSTANCE.requestToEntity(articleRequest);
             articleEntity.setTags(getTagsFromRequest(articleRequest.getTags()));
             articleEntity.setDraft(true);
-
             articleRepository.save(articleEntity);
             sendMail(articleId, "update");
             message = "Article is sent for reviewing";

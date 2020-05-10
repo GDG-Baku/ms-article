@@ -13,4 +13,5 @@ public class ArticleRequest {
     private String title;
     private String content;
     private List<TagRequest> tags;
+    private String type;
 }
