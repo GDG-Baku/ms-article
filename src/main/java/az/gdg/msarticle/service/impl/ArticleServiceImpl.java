@@ -38,8 +38,8 @@ public class ArticleServiceImpl implements ArticleService {
             articleEntity.setQuackCount(articleEntity.getQuackCount() + 1);
             articleRepository.save(articleEntity);
         } else {
-            logger.info("Thrown.NoAccessException");
-            throw new NoAccessException("You don't quack");
+            logger.error("Thrown.NoAccessException");
+            throw new NoAccessException("You don't have access to quack");
         }
     }
 
