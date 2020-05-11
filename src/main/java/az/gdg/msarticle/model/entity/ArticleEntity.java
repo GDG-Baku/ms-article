@@ -22,6 +22,7 @@ import java.util.List;
 public class ArticleEntity {
     @Id
     private String id;
+    private Integer type;
     private Integer userId;
     private String title;
     private String content;
@@ -30,6 +31,7 @@ public class ArticleEntity {
     @LastModifiedDate
     private LocalDateTime updatedAt;
     private Integer quackCount;
+    private Integer hateCount;
     private Integer readCount;
     private boolean isDraft;
     private boolean isApproved;

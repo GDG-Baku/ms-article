@@ -20,10 +20,12 @@ public class ArticleController {
         this.articleService = articleService;
     }
 
-    @GetMapping("/articles/{userId}")
-    public UserArticleDTO getArticlesByUserId (@RequestHeader(value = "X-Auth-Token", required = false) String token,
-                                               @PathVariable("userId") int userId){
+    @GetMapping("/articles/{userId}/{page}")
+    public UserArticleDTO getArticlesByUserId(
+            @RequestHeader(value = "X-Auth-Token", required = false) String token,
+            @PathVariable("userId") int userId,
+            @PathVariable("page") int page) {
         logger.debug("Get articles by userId {} start", userId);
-        return articleService.getArticlesByUserId(userId);
+        return articleService.getArticlesByUserId(userId, page);
     }
 }

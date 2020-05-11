@@ -10,6 +10,9 @@ import az.gdg.msarticle.service.ArticleService;
 import az.gdg.msarticle.service.MsAuthService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -30,15 +33,16 @@ public class ArticleServiceImpl implements ArticleService{
 
 
     @Override
-    public UserArticleDTO getArticlesByUserId(int userId) {
+    public UserArticleDTO getArticlesByUserId(int userId, int page) {
         logger.info("ActionLog.getArticlesByUserId.start with userId {}", userId);
         List<ArticleEntity> articleEntities;
+        Pageable pageable = PageRequest.of(page, 5, Sort.by("createdAt").descending());
         if(getAuthenticatedObject() != null &&
                 Integer.parseInt(getAuthenticatedObject().getPrincipal().toString()) == userId ) {
-            articleEntities = articleRepository.getArticleEntitiesByUserId(userId);
+            articleEntities = articleRepository.getArticleEntitiesByUserId(userId, pageable).getContent();
         } else{
             articleEntities = articleRepository.
-                    getArticleEntitiesByUserIdAndIsDraftAndIsApproved(userId, false, true);
+                    getArticleEntitiesByUserIdAndIsDraftAndIsApproved(userId, false, true, pageable).getContent();
         }
         List<ArticleDTO> articleDTOs = ArticleMapper.INSTANCE.entityToDtoList(articleEntities);
         UserDTO userDTO = msAuthService.getUserById(userId);
