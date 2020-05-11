@@ -14,8 +14,16 @@ import java.util.List;
 @NoArgsConstructor
 public class ArticleDTO {
     private String id;
+    private String firstName;
+    private String lastName;
+    private String imageUrl;
+    private String type;
+    private Integer userId;
     private String title;
     private String content;
+    private Integer quackCount;
+    private Integer readCount;
+    private Integer hateCount;
     private LocalDateTime createdAt;
     private boolean isDraft;
     private List<TagDTO> tags;
