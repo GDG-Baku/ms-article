@@ -25,6 +25,7 @@ public class ArticleDTO {
     private Integer quackCount;
     private Integer hateCount;
     private Integer readCount;
+    private String type;
     private boolean isDraft;
     private List<TagDTO> tags;
     private List<CommentDTO> comments;

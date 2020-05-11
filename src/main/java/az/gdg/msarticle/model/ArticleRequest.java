@@ -17,4 +17,5 @@ public class ArticleRequest {
     private String title;
     private String content;
     private List<TagDTO> tags;
+    private String type;
 }
