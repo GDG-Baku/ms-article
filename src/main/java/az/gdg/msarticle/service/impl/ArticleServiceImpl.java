@@ -2,6 +2,7 @@ package az.gdg.msarticle.service.impl;
 
 import az.gdg.msarticle.exception.ArticleNotFoundException;
 import az.gdg.msarticle.exception.InvalidTokenException;
+import az.gdg.msarticle.exception.NoAccessException;
 import az.gdg.msarticle.mail.service.EmailService;
 import az.gdg.msarticle.mapper.ArticleMapper;
 import az.gdg.msarticle.mapper.TagMapper;
@@ -57,7 +58,7 @@ public class ArticleServiceImpl implements ArticleService {
             message = "Article is sent for reviewing";
             logger.info("ActionLog.updateArticle.success with id {}", articleId);
         } else {
-            message = NO_ACCESS_TO_REQUEST;
+            throw new NoAccessException(NO_ACCESS_TO_REQUEST);
         }
         logger.info("ActionLog.updateArticle.end with id {}", articleId);
         return message;
