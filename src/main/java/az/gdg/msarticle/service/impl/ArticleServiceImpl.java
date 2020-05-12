@@ -1,6 +1,7 @@
 package az.gdg.msarticle.service.impl;
 
 import az.gdg.msarticle.exception.ArticleNotFoundException;
+import az.gdg.msarticle.exception.NoAccessException;
 import az.gdg.msarticle.exception.NotValidTokenException;
 import az.gdg.msarticle.mail.service.EmailService;
 import az.gdg.msarticle.model.entity.ArticleEntity;
@@ -19,6 +20,7 @@ public class ArticleServiceImpl implements ArticleService {
     private static final Logger logger = LoggerFactory.getLogger(ArticleServiceImpl.class);
     private final ArticleRepository articleRepository;
     private final EmailService emailService;
+    private static final String NO_ACCESS_TO_REQUEST = "You don't have access for this request";
 
     public ArticleServiceImpl(ArticleRepository articleRepository, EmailService emailService) {
         this.articleRepository = articleRepository;
@@ -51,7 +53,7 @@ public class ArticleServiceImpl implements ArticleService {
             return message;
         }
         logger.info("ActionLog.publishArticle.end");
-        return "You don't have permission for this";
+        throw new NoAccessException(NO_ACCESS_TO_REQUEST);
     }
 
 
