@@ -2,6 +2,7 @@ package az.gdg.msarticle.service.impl;
 
 import az.gdg.msarticle.exception.CommentNotFoundException;
 import az.gdg.msarticle.exception.InvalidTokenException;
+import az.gdg.msarticle.exception.NoAccessException;
 import az.gdg.msarticle.model.entity.CommentEntity;
 import az.gdg.msarticle.repository.CommentRepository;
 import az.gdg.msarticle.service.CommentService;
@@ -47,7 +48,7 @@ public class CommentServiceImpl implements CommentService {
             logger.info("ActionLog.deleteComment.success with id {}", id);
             message = "Comment is deleted";
         } else {
-            message = NO_ACCESS_TO_REQUEST;
+            throw new NoAccessException(NO_ACCESS_TO_REQUEST);
         }
         logger.info("ActionLog.deleteComment.end with id {}", id);
         return message;
