@@ -25,6 +25,6 @@ public class ArticleController {
     public void addQuackByArticleId(@RequestHeader("X-Auth-Token") String token,
                                     @PathVariable("articleId") String articleId) {
         logger.debug("add quack by articleId {} start", articleId);
-        articleService.addQuackByArticleId(articleId);
+        articleService.addQuackByArticleId(articleId, token);
     }
 }
