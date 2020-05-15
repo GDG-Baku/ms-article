@@ -45,7 +45,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public void post(String token, CommentRequest commentRequest) {
-        logger.info("ActionLog.post.start : token {}", token);
+        logger.info("ActionLog.post.start");
 
         Optional<ArticleEntity> articleEntity = articleRepository.findById(commentRequest.getArticleId());
 
@@ -70,7 +70,6 @@ public class CommentServiceImpl implements CommentService {
                     commentRepository.save(parent);
 
                 } else {
-                    logger.info("Thrown.WrongDataException");
                     throw new WrongDataException("Is not allowed writing reply to reply");
                 }
 
@@ -89,7 +88,6 @@ public class CommentServiceImpl implements CommentService {
             }
 
         } else {
-            logger.error("Thrown.ArticleNotFoundException");
             throw new ArticleNotFoundException("Not found such article!");
 
         }

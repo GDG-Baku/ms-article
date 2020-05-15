@@ -29,7 +29,7 @@ public class CommentController {
     public void post(@RequestBody CommentRequest commentRequest,
                      @RequestHeader("X-Auth-Token") String token) {
 
-        logger.debug("post start : token {}", token);
+        logger.debug("post start");
         commentService.post(token, commentRequest);
         logger.debug("post stop.success");
     }
