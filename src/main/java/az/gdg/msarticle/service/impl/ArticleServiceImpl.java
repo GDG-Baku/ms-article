@@ -39,8 +39,7 @@ public class ArticleServiceImpl implements ArticleService {
             msAuthClient.addPopularity(userId);
             articleRepository.save(article);
         } else {
-            logger.info("Thrown.ArticleNotFoundException");
-            throw new ArticleNotFoundException("No found such article");
+            throw new ArticleNotFoundException("Not found such article");
         }
 
         logger.info("ActionLog.addReadCount.stop.success");
