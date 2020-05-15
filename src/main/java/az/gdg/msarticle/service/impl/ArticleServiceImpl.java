@@ -78,7 +78,6 @@ public class ArticleServiceImpl implements ArticleService {
             return articleDTOs;
 
         } else {
-            logger.error("Thrown.NotFoundException");
             throw new NotFoundException("Page is not found!");
         }
     }
