@@ -1,6 +1,6 @@
 package az.gdg.msarticle.mapper;
 
-import az.gdg.msarticle.exception.TypeNotFoundException;
+import az.gdg.msarticle.exception.InvalidTypeException;
 import az.gdg.msarticle.model.ArticleRequest;
 import az.gdg.msarticle.model.TypeEnum;
 import az.gdg.msarticle.model.entity.ArticleEntity;
@@ -21,7 +21,7 @@ public interface ArticleMapper {
                 return typeEnum.getValue();
             }
         }
-        throw new TypeNotFoundException("Please, specify valid type");
+        throw new InvalidTypeException("Please, specify valid type");
     }
 
     @Mapping(source = "type", target = "type", qualifiedByName = "getValueOfType")

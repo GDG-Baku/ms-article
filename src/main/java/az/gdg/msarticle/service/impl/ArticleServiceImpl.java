@@ -1,6 +1,7 @@
 package az.gdg.msarticle.service.impl;
 
 import az.gdg.msarticle.exception.InvalidTokenException;
+import az.gdg.msarticle.exception.InvalidTypeException;
 import az.gdg.msarticle.mapper.ArticleMapper;
 import az.gdg.msarticle.model.ArticleRequest;
 import az.gdg.msarticle.model.entity.ArticleEntity;
@@ -35,23 +36,28 @@ public class ArticleServiceImpl implements ArticleService {
     @Override
     public String addDraft(String token, ArticleRequest articleRequest) {
         logger.info("ActionLog.addDraft.start");
-        String userId = (String) getAuthenticatedObject().getPrincipal();
+        if (articleRequest.getType().equals("ARTICLE")) {
+            String userId = (String) getAuthenticatedObject().getPrincipal();
 
-        ArticleEntity draft = ArticleMapper.INSTANCE.requestToEntity(articleRequest);
-        draft.setUserId(Integer.parseInt(userId));
-        draft.setDraft(true);
-        draft.setReadCount(0);
-        draft.setHateCount(0);
-        draft.setQuackCount(0);
-        draft.setApproved(false);
-        draft.setApproverId(null);
-        draft.setComments(null);
-        tagRepository.saveAll(draft.getTags());
-        articleRepository.save(draft);
+            ArticleEntity draft = ArticleMapper.INSTANCE.requestToEntity(articleRequest);
+            draft.setUserId(Integer.parseInt(userId));
+            draft.setDraft(true);
+            draft.setReadCount(0);
+            draft.setHateCount(0);
+            draft.setQuackCount(0);
+            draft.setApproved(false);
+            draft.setApproverId(null);
+            draft.setComments(null);
+            tagRepository.saveAll(draft.getTags());
+            articleRepository.save(draft);
 
-        logger.info("ActionLog.addDraft.stop.success");
+            logger.info("ActionLog.addDraft.stop.success");
 
-        return draft.getId();
+            return draft.getId();
+        } else {
+            throw new InvalidTypeException("Not allowed enter the type different from ARTICLE!");
+        }
+
 
     }
 }
