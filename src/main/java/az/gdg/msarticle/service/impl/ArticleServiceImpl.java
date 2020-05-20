@@ -1,7 +1,7 @@
 package az.gdg.msarticle.service.impl;
 
-import az.gdg.msarticle.exception.NoAccessException;
 import az.gdg.msarticle.exception.NoSuchArticleException;
+import az.gdg.msarticle.exception.UnauthorizedAccessException;
 import az.gdg.msarticle.mapper.ArticleMapper;
 import az.gdg.msarticle.mapper.CommentMapper;
 import az.gdg.msarticle.model.dto.ArticleDTO;
@@ -38,20 +38,15 @@ public class ArticleServiceImpl implements ArticleService{
         logger.info("ActionLog.getArticleById.start with id {}", articleId);
         ArticleEntity articleEntity = articleRepository.findById(articleId)
                 .orElseThrow(() -> new NoSuchArticleException("Article doesn't exist"));
-        int userId = articleEntity.getUserId();
-
+        Integer userId = articleEntity.getUserId();
         if(articleEntity.isDraft() && !(getAuthenticatedObject() != null &&
                 Integer.parseInt(getAuthenticatedObject().getPrincipal().toString()) == userId) ) {
-            logger.info("Thrown.NoAccessException");
-            throw new NoAccessException("You don't have permission to get the article");
+            logger.info("Thrown.UnauthorizedAccessException");
+            throw new UnauthorizedAccessException("You don't have permission to get the article");
         }
-        ArticleDTO articleDTO = ArticleMapper.INSTANCE.entityToDto(articleEntity);
-        articleDTO.setComments(commentMapper.mapEntityListToDtoList(articleEntity.getComments()));
-
         UserDTO userDTO = msAuthService.getUserById(userId);
-        articleDTO.setFirstName(userDTO.getFirstName());
-        articleDTO.setLastName(userDTO.getLastName());
-        articleDTO.setImageUrl(userDTO.getImageUrl());
+        ArticleDTO articleDTO = ArticleMapper.INSTANCE.entityToDto(articleEntity, userDTO);
+        articleDTO.setComments(commentMapper.mapEntityListToDtoList(articleEntity.getComments()));
 
         logger.info("ActionLog.getArticleById.end with id {}", articleId);
         return articleDTO;

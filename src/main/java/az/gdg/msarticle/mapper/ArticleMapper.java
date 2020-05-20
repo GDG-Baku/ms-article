@@ -3,6 +3,7 @@ package az.gdg.msarticle.mapper;
 import az.gdg.msarticle.exception.TypeNotFoundException;
 import az.gdg.msarticle.model.TypeEnum;
 import az.gdg.msarticle.model.dto.ArticleDTO;
+import az.gdg.msarticle.model.dto.UserDTO;
 import az.gdg.msarticle.model.entity.ArticleEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -32,6 +33,9 @@ public interface ArticleMapper {
     List<ArticleDTO> entityToDtoList(List<ArticleEntity> articleEntities);
 
     @Mapping(target = "comments", ignore = true)
-    @Mapping(source = "type", target = "type", qualifiedByName = "getTypeOfValue")
-    ArticleDTO entityToDto(ArticleEntity articleEntity);
+    @Mapping(source = "articleEntity.type", target = "type", qualifiedByName = "getTypeOfValue")
+    @Mapping(source = "userDTO", target = "userDTO")
+//    @Mapping(source = "userDTO.lastName", target = "userDTO.lastName")
+//    @Mapping(source = "userDTO.imageUrl", target = "userDTO.imageUrl")
+    ArticleDTO entityToDto(ArticleEntity articleEntity, UserDTO userDTO);
 }

@@ -9,6 +9,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 public interface MsAuthService {
     @GetMapping("/user/{userId}")
     UserDTO getUserById(
-            @PathVariable("userId") int userId
+            @PathVariable("userId") Integer userId
     );
 }

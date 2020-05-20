@@ -21,9 +21,7 @@ public class CommentMapper {
     private CommentDTO mapEntityToDto(CommentEntity commentEntity) {
         UserDTO userDTO = msAuthService.getUserById(commentEntity.getUserId());
         return CommentDTO.builder()
-                .firstName(userDTO.getFirstName())
-                .lastName(userDTO.getLastName())
-                .imageUrl(userDTO.getImageUrl())
+                .userDTO(userDTO)
                 .userId(commentEntity.getUserId())
                 .text(commentEntity.getText())
                 .createdAt(commentEntity.getCreatedAt())
