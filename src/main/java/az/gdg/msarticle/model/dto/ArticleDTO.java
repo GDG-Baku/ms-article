@@ -14,9 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 public class ArticleDTO {
     private String id;
-    private String firstName;
-    private String lastName;
-    private String imageUrl;
+    private UserDTO userDTO;
     private String type;
     private Integer userId;
     private String title;
