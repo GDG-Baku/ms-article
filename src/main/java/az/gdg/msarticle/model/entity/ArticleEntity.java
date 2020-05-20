@@ -18,7 +18,7 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Document(collection = "article")
+@Document(collection = "articles")
 public class ArticleEntity {
     @Id
     private String id;
