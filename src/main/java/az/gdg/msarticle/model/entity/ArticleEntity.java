@@ -24,10 +24,8 @@ public class ArticleEntity {
     private Integer userId;
     private String title;
     private String content;
-
     @CreatedDate
     private LocalDateTime createdAt;
-
     @LastModifiedDate
     private LocalDateTime updatedAt;
     private Integer quackCount;
