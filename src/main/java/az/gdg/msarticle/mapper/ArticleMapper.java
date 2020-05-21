@@ -35,7 +35,5 @@ public interface ArticleMapper {
     @Mapping(target = "comments", ignore = true)
     @Mapping(source = "articleEntity.type", target = "type", qualifiedByName = "getTypeOfValue")
     @Mapping(source = "userDTO", target = "userDTO")
-//    @Mapping(source = "userDTO.lastName", target = "userDTO.lastName")
-//    @Mapping(source = "userDTO.imageUrl", target = "userDTO.imageUrl")
     ArticleDTO entityToDto(ArticleEntity articleEntity, UserDTO userDTO);
 }

@@ -1,6 +1,7 @@
 package az.gdg.msarticle.service.impl;
 
 import az.gdg.msarticle.exception.NoSuchArticleException;
+import az.gdg.msarticle.exception.NotValidTokenException;
 import az.gdg.msarticle.exception.UnauthorizedAccessException;
 import az.gdg.msarticle.mapper.ArticleMapper;
 import az.gdg.msarticle.mapper.CommentMapper;
@@ -39,10 +40,16 @@ public class ArticleServiceImpl implements ArticleService{
         ArticleEntity articleEntity = articleRepository.findById(articleId)
                 .orElseThrow(() -> new NoSuchArticleException("Article doesn't exist"));
         Integer userId = articleEntity.getUserId();
-        if(articleEntity.isDraft() && !(getAuthenticatedObject() != null &&
-                Integer.parseInt(getAuthenticatedObject().getPrincipal().toString()) == userId) ) {
-            logger.info("Thrown.UnauthorizedAccessException");
-            throw new UnauthorizedAccessException("You don't have permission to get the article");
+        if (articleEntity.isDraft()) {
+            try {
+                if (Integer.parseInt(getAuthenticatedObject().getPrincipal().toString()) != userId) {
+                    logger.error("Thrown.UnauthorizedAccessException");
+                    throw new UnauthorizedAccessException("You don't have permission to get the article");
+                }
+            } catch (RuntimeException e) {
+                logger.error("Thrown.UnauthorizedAccessException");
+                throw new UnauthorizedAccessException("You don't have permission to get the article");
+            }
         }
         UserDTO userDTO = msAuthService.getUserById(userId);
         ArticleDTO articleDTO = ArticleMapper.INSTANCE.entityToDto(articleEntity, userDTO);
@@ -54,6 +61,10 @@ public class ArticleServiceImpl implements ArticleService{
 
 
     private Authentication getAuthenticatedObject() {
+        if (SecurityContextHolder.getContext().getAuthentication() == null) {
+            logger.info("Thrown.NotValidTokenException");
+            throw new NotValidTokenException("Token is not valid or it is expired");
+        }
         return SecurityContextHolder.getContext().getAuthentication();
     }
 
