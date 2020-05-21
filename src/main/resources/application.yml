@@ -1,0 +1,18 @@
+server:
+  port: 8080
+logging:
+  level:
+    org:
+      springframework:
+        web: DEBUG
+spring:
+  data:
+    mongodb:
+      uri: ${MONGODB_URI}
+
+swagger:
+  enabled: true
+
+service:
+  url:
+    ms-auth: http://gdg-ms-auth.herokuapp.com
