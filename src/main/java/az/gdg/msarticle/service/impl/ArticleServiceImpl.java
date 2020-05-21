@@ -2,7 +2,7 @@ package az.gdg.msarticle.service.impl;
 
 import az.gdg.msarticle.client.AuthenticationClient;
 import az.gdg.msarticle.client.dto.UserDetail;
-import az.gdg.msarticle.exception.NotFoundException;
+import az.gdg.msarticle.exception.PageFoundException;
 import az.gdg.msarticle.mapper.ArticleMapper;
 import az.gdg.msarticle.model.dto.ArticleDTO;
 import az.gdg.msarticle.model.entity.ArticleEntity;
@@ -78,7 +78,7 @@ public class ArticleServiceImpl implements ArticleService {
             return articleDTOs;
 
         } else {
-            throw new NotFoundException("Page is not found!");
+            throw new PageFoundException("Page is not found!");
         }
     }
 }

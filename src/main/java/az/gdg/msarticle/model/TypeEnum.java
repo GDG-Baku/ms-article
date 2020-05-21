@@ -2,7 +2,7 @@ package az.gdg.msarticle.model;
 
 public enum TypeEnum {
 
-    ARTICLE(1), FORUM(2), NEWS(3);
+    ARTICLE(0), FORUM(1), NEWS(2);
 
     private final int value;
 
