@@ -9,7 +9,6 @@ import az.gdg.msarticle.model.entity.ArticleEntity;
 import az.gdg.msarticle.model.entity.CommentEntity;
 import az.gdg.msarticle.repository.ArticleRepository;
 import az.gdg.msarticle.repository.CommentRepository;
-import az.gdg.msarticle.repository.TagRepository;
 import az.gdg.msarticle.service.CommentService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,13 +24,11 @@ public class CommentServiceImpl implements CommentService {
 
     private static final Logger logger = LoggerFactory.getLogger(CommentServiceImpl.class);
     private final ArticleRepository articleRepository;
-    private final TagRepository tagRepository;
     private final CommentRepository commentRepository;
 
     public CommentServiceImpl(CommentRepository commentRepository,
-                              ArticleRepository articleRepository, TagRepository tagRepository) {
+                              ArticleRepository articleRepository) {
         this.articleRepository = articleRepository;
-        this.tagRepository = tagRepository;
         this.commentRepository = commentRepository;
     }
 

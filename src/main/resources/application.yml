@@ -13,4 +13,9 @@ spring:
 swagger:
   enabled: true
 
+service:
+  url:
+    ms-auth: https://gdg-ms-auth.herokuapp.com
+
+
 
