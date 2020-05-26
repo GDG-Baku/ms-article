@@ -1,6 +1,7 @@
 package az.gdg.msarticle.service.impl;
 
 import az.gdg.msarticle.exception.ArticleNotFoundException;
+import az.gdg.msarticle.exception.CommentNotFoundException;
 import az.gdg.msarticle.exception.InvalidTokenException;
 import az.gdg.msarticle.exception.WrongDataException;
 import az.gdg.msarticle.mapper.CommentMapper;
@@ -41,8 +42,8 @@ public class CommentServiceImpl implements CommentService {
 
 
     @Override
-    public void post(String token, CommentRequest commentRequest) {
-        logger.info("ActionLog.post.start");
+    public void postComment(String token, CommentRequest commentRequest) {
+        logger.info("ActionLog.post.start : articleId {}", commentRequest.getArticleId());
 
         Optional<ArticleEntity> articleEntity = articleRepository.findById(commentRequest.getArticleId());
 
@@ -55,16 +56,19 @@ public class CommentServiceImpl implements CommentService {
             if (article.getComments() != null && !commentRequest.getParentCommentId().isEmpty()) {
                 Optional<CommentEntity> parentComment = commentRepository.findById(commentRequest.getParentCommentId());
                 commentEntity.setReply(true);
-                CommentEntity parent = parentComment.get();
+                CommentEntity comment = parentComment.orElseThrow(
+                        () -> new CommentNotFoundException("Not found such comment!")
+                );
 
-                if (!parent.isReply()) {
-                    if (parent.getReplies() != null) {
-                        parent.getReplies().add(commentEntity);
+
+                if (!comment.isReply()) {
+                    if (comment.getReplies() != null) {
+                        comment.getReplies().add(commentEntity);
                     } else {
-                        parent.setReplies(Collections.singletonList(commentEntity));
+                        comment.setReplies(Collections.singletonList(commentEntity));
                     }
                     commentRepository.save(commentEntity);
-                    commentRepository.save(parent);
+                    commentRepository.save(comment);
 
                 } else {
                     throw new WrongDataException("Is not allowed writing reply to reply");
@@ -89,7 +93,7 @@ public class CommentServiceImpl implements CommentService {
 
         }
 
-        logger.info("ActionLog.post.stop.success");
+        logger.info("ActionLog.post.stop.success : articleId{}", commentRequest.getArticleId());
 
     }
 }

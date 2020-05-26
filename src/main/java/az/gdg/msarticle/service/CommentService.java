@@ -4,6 +4,6 @@ import az.gdg.msarticle.model.CommentRequest;
 
 public interface CommentService {
 
-    void post(String token, CommentRequest commentRequest);
+    void postComment(String token, CommentRequest commentRequest);
 
 }
