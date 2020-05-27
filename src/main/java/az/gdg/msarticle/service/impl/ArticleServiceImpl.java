@@ -19,7 +19,7 @@ import org.springframework.stereotype.Service;
 
 
 @Service
-public class ArticleServiceImpl implements ArticleService{
+public class ArticleServiceImpl implements ArticleService {
     private static final Logger logger = LoggerFactory.getLogger(ArticleServiceImpl.class);
     private final ArticleRepository articleRepository;
     private final MsAuthService msAuthService;
