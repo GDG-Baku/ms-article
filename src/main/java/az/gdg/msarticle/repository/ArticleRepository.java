@@ -7,10 +7,9 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ArticleRepository extends MongoRepository<ArticleEntity,String> {
+public interface ArticleRepository extends MongoRepository<ArticleEntity, String> {
 
     Page<ArticleEntity> getArticleEntitiesByUserId(Integer userId, Pageable pageable);
 
-    Page<ArticleEntity> getArticleEntitiesByUserIdAndIsDraftAndIsApproved(Integer userId, boolean isDraft,
-                                                                          boolean isApproved, Pageable pageable);
+    Page<ArticleEntity> getArticleEntitiesByUserIdAndIsDraftFalseAndIsApprovedTrue(Integer userId, Pageable pageable);
 }

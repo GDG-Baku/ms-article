@@ -1,5 +1,6 @@
 package az.gdg.msarticle.service.impl;
 
+import az.gdg.msarticle.exception.NotValidTokenException;
 import az.gdg.msarticle.mapper.ArticleMapper;
 import az.gdg.msarticle.model.dto.ArticleDTO;
 import az.gdg.msarticle.model.dto.UserArticleDTO;
@@ -20,7 +21,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class ArticleServiceImpl implements ArticleService{
+public class ArticleServiceImpl implements ArticleService {
     private static final Logger logger = LoggerFactory.getLogger(ArticleServiceImpl.class);
     private final ArticleRepository articleRepository;
     private final MsAuthService msAuthService;
@@ -33,16 +34,17 @@ public class ArticleServiceImpl implements ArticleService{
 
 
     @Override
-    public UserArticleDTO getArticlesByUserId(int userId, int page) {
+    public UserArticleDTO getArticlesByUserId(Integer userId, int page) {
         logger.info("ActionLog.getArticlesByUserId.start with userId {}", userId);
-        List<ArticleEntity> articleEntities;
+        List<ArticleEntity> articleEntities = null;
         Pageable pageable = PageRequest.of(page, 5, Sort.by("createdAt").descending());
-        if(getAuthenticatedObject() != null &&
-                Integer.parseInt(getAuthenticatedObject().getPrincipal().toString()) == userId ) {
-            articleEntities = articleRepository.getArticleEntitiesByUserId(userId, pageable).getContent();
-        } else{
-            articleEntities = articleRepository.
-                    getArticleEntitiesByUserIdAndIsDraftAndIsApproved(userId, false, true, pageable).getContent();
+        try {
+            if (Integer.parseInt(getAuthenticatedObject().getPrincipal().toString()) == userId) {
+                articleEntities = articleRepository.getArticleEntitiesByUserId(userId, pageable).getContent();
+            }
+        } catch (NotValidTokenException e) {
+            articleEntities = articleRepository
+                    .getArticleEntitiesByUserIdAndIsDraftFalseAndIsApprovedTrue(userId, pageable).getContent();
         }
         List<ArticleDTO> articleDTOs = ArticleMapper.INSTANCE.entityToDtoList(articleEntities);
         UserDTO userDTO = msAuthService.getUserById(userId);
@@ -50,13 +52,15 @@ public class ArticleServiceImpl implements ArticleService{
         logger.info("ActionLog.getArticlesByUserId.end with userId {}", userId);
         return UserArticleDTO.builder()
                 .articleDTOs(articleDTOs)
-                .firstName(userDTO.getFirstName())
-                .lastName(userDTO.getLastName())
-                .imageUrl(userDTO.getImageUrl())
+                .userDTO(userDTO)
                 .build();
     }
 
     private Authentication getAuthenticatedObject() {
+        if (SecurityContextHolder.getContext().getAuthentication() == null) {
+            logger.info("Thrown.NotValidTokenException");
+            throw new NotValidTokenException("Token is not valid or it is expired");
+        }
         return SecurityContextHolder.getContext().getAuthentication();
     }
 
