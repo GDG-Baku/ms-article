@@ -3,7 +3,7 @@ package az.gdg.msarticle.service.impl;
 import az.gdg.msarticle.exception.ArticleNotFoundException;
 import az.gdg.msarticle.exception.CommentNotFoundException;
 import az.gdg.msarticle.exception.InvalidTokenException;
-import az.gdg.msarticle.exception.WrongDataException;
+import az.gdg.msarticle.exception.NotAllowedException;
 import az.gdg.msarticle.mapper.CommentMapper;
 import az.gdg.msarticle.model.CommentRequest;
 import az.gdg.msarticle.model.entity.ArticleEntity;
@@ -18,7 +18,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
-import java.util.Optional;
 
 @Service
 public class CommentServiceImpl implements CommentService {
@@ -43,57 +42,42 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public void postComment(String token, CommentRequest commentRequest) {
-        logger.info("ActionLog.post.start : articleId {}", commentRequest.getArticleId());
+        logger.info("ActionLog.postComment.start : articleId {}", commentRequest.getArticleId());
 
-        Optional<ArticleEntity> articleEntity = articleRepository.findById(commentRequest.getArticleId());
+        ArticleEntity article = articleRepository.findById(commentRequest.getArticleId()).orElseThrow(
+                () -> new ArticleNotFoundException("Not found such article!")
+        );
 
-        if (articleEntity.isPresent()) {
-            String userId = (String) getAuthenticatedObject().getPrincipal();
-            ArticleEntity article = articleEntity.get();
-            CommentEntity commentEntity = CommentMapper.INSTANCE.requestToEntity(commentRequest);
-            commentEntity.setUserId(Integer.parseInt(userId));
+        String userId = (String) getAuthenticatedObject().getPrincipal();
+        CommentEntity commentEntity = CommentMapper.INSTANCE.requestToEntity(commentRequest);
+        commentEntity.setUserId(Integer.parseInt(userId));
 
-            if (article.getComments() != null && !commentRequest.getParentCommentId().isEmpty()) {
-                Optional<CommentEntity> parentComment = commentRepository.findById(commentRequest.getParentCommentId());
-                commentEntity.setReply(true);
-                CommentEntity comment = parentComment.orElseThrow(
-                        () -> new CommentNotFoundException("Not found such comment!")
-                );
+        if (!commentRequest.getParentCommentId().isEmpty()) {
+            commentEntity.setReply(true);
+            CommentEntity comment = commentRepository.findById(commentRequest.getParentCommentId())
+                    .orElseThrow(() -> new CommentNotFoundException("Not found such comment!"));
 
 
-                if (!comment.isReply()) {
-                    if (comment.getReplies() != null) {
-                        comment.getReplies().add(commentEntity);
-                    } else {
-                        comment.setReplies(Collections.singletonList(commentEntity));
-                    }
-                    commentRepository.save(commentEntity);
-                    commentRepository.save(comment);
-
-                } else {
-                    throw new WrongDataException("Is not allowed writing reply to reply");
-                }
-
+            if (!comment.isReply()) {
+                comment.getReplies().add(commentEntity);
+                commentRepository.save(commentEntity);
+                commentRepository.save(comment);
 
             } else {
-                commentEntity.setReply(false);
-                commentRepository.save(commentEntity);
-
-                if (article.getComments() == null) {
-                    article.setComments(Collections.singletonList(commentEntity));
-                } else {
-                    article.getComments().add(commentEntity);
-                }
-
-                articleRepository.save(article);
+                throw new NotAllowedException("Is not allowed writing reply to reply");
             }
 
-        } else {
-            throw new ArticleNotFoundException("Not found such article!");
 
+        } else {
+            commentEntity.setReplies(Collections.emptyList());
+            commentEntity.setReply(false);
+            commentRepository.save(commentEntity);
+            article.getComments().add(commentEntity);
+            articleRepository.save(article);
         }
 
-        logger.info("ActionLog.post.stop.success : articleId{}", commentRequest.getArticleId());
+
+        logger.info("ActionLog.postComment.stop.success : articleId {}", commentRequest.getArticleId());
 
     }
 }
