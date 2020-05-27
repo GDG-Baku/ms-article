@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface ArticleRepository extends MongoRepository<ArticleEntity,String> {
+public interface ArticleRepository extends MongoRepository<ArticleEntity, String> {
 
     List<ArticleEntity> getArticleEntitiesByUserId(Integer userId);
 
