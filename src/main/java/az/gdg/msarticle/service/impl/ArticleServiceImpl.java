@@ -1,8 +1,8 @@
 package az.gdg.msarticle.service.impl;
 
-import az.gdg.msarticle.exception.NoAccessException;
 import az.gdg.msarticle.exception.NoSuchArticleException;
 import az.gdg.msarticle.exception.NotValidTokenException;
+import az.gdg.msarticle.exception.UnauthorizedAccessException;
 import az.gdg.msarticle.model.entity.ArticleEntity;
 import az.gdg.msarticle.model.entity.CommentEntity;
 import az.gdg.msarticle.repository.ArticleRepository;
@@ -49,8 +49,8 @@ public class ArticleServiceImpl implements ArticleService {
             // end
             articleRepository.deleteById(articleID);
         } else {
-            logger.info("Thrown.NoAccessException");
-            throw new NoAccessException("You don't have permission to delete the article");
+            logger.info("Thrown.UnauthorizedAccessException");
+            throw new UnauthorizedAccessException("You don't have permission to delete the article");
         }
     }
 
