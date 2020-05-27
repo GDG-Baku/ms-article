@@ -17,8 +17,6 @@ public interface ArticleMapper {
 
     ArticleMapper INSTANCE = Mappers.getMapper(ArticleMapper.class);
 
-    ArticleEntity dtoToEntity(ArticleDTO articleDTO);
-
     @Named("getTypeOfValue")
     static String getTypeOfValue(Integer type) {
         for (TypeEnum typeEnum : TypeEnum.values()) {
@@ -28,6 +26,8 @@ public interface ArticleMapper {
         }
         throw new TypeNotFoundException("Please, specify valid type");
     }
+
+    ArticleEntity dtoToEntity(ArticleDTO articleDTO);
 
     List<ArticleDTO> entityToDtoList(List<ArticleEntity> articleEntities);
 
