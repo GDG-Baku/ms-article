@@ -18,7 +18,7 @@ import java.util.List;
 
 
 @Service
-public class ArticleServiceImpl implements ArticleService{
+public class ArticleServiceImpl implements ArticleService {
     private static final Logger logger = LoggerFactory.getLogger(ArticleServiceImpl.class);
     private final ArticleRepository articleRepository;
     private final CommentRepository commentRepository;
@@ -33,11 +33,11 @@ public class ArticleServiceImpl implements ArticleService{
     @Override
     public void deleteArticleById(String articleID) {
         logger.info("ActionLog.deleteArticleById.start");
-        int userId = Integer.parseInt((String)getAuthenticatedObject().getPrincipal());
+        Integer userId = Integer.parseInt((String) getAuthenticatedObject().getPrincipal());
         ArticleEntity articleEntity = articleRepository.findById(articleID)
                 .orElseThrow(() -> new NoSuchArticleException("Article doesn't exist"));
-        int articleUserId = articleEntity.getUserId();
-        if(userId == articleUserId) {
+        Integer articleUserId = articleEntity.getUserId();
+        if (userId == articleUserId) {
             // deleting comments and replies before delete article - start
             List<CommentEntity> commentEntityList = articleEntity.getComments();
             for (CommentEntity commentEntity : commentEntityList) {
