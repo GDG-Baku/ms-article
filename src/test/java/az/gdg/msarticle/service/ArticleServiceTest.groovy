@@ -24,7 +24,7 @@ class ArticleServiceTest extends Specification {
         articleServiceImpl = new ArticleServiceImpl(articleRepository, commentRepository)
     }
     
-    def "should use the repository to fetch article by id"() {
+    def "should use the repository to delete article by id"() {
         given:
             def articleId = "5eac708be7179a42f172de4c"
             def tag = new TagEntity()
