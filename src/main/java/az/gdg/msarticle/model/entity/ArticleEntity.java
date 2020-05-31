@@ -30,6 +30,7 @@ public class ArticleEntity {
     @LastModifiedDate
     private LocalDateTime updatedAt;
     private Integer quackCount;
+    private Integer hateCount;
     private Integer readCount;
     private boolean isDraft;
     private boolean isApproved;

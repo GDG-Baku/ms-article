@@ -38,20 +38,21 @@ public class ArticleServiceImpl implements ArticleService {
                 .orElseThrow(() -> new NoSuchArticleException("Article doesn't exist"));
         Integer articleUserId = articleEntity.getUserId();
         if (articleUserId.equals(userId)) {
-            // deleting comments and replies before delete article - start
-            List<CommentEntity> commentEntityList = articleEntity.getComments();
-            for (CommentEntity commentEntity : commentEntityList) {
-                if (commentEntity.getReplies() != null) {
-                    commentRepository.deleteAll(commentEntity.getReplies());
-                }
-            }
-            commentRepository.deleteAll(commentEntityList);
-            // end
+            deleteAllComments(articleEntity.getComments());
             articleRepository.deleteById(articleID);
         } else {
             logger.info("Thrown.UnauthorizedAccessException");
             throw new UnauthorizedAccessException("You don't have permission to delete the article");
         }
+    }
+
+    private void deleteAllComments(List<CommentEntity> commentEntityList) {
+        for (CommentEntity commentEntity : commentEntityList) {
+            if (commentEntity.getReplies() != null) {
+                commentRepository.deleteAll(commentEntity.getReplies());
+            }
+        }
+        commentRepository.deleteAll(commentEntityList);
     }
 
     private Authentication getAuthenticatedObject() {
