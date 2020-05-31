@@ -9,8 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-
 @Service
 public class ArticleServiceImpl implements ArticleService {
 
@@ -26,21 +24,16 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     public void addReadCount(String articleId) {
-        logger.info("ActionLog.addReadCount.start : articleId {}", articleId);
-        Optional<ArticleEntity> articleEntity = articleRepository.findById(articleId);
+        logger.info("ActionLog.addReadCount.start.articleId : {}", articleId);
+        ArticleEntity articleEntity = articleRepository.findById(articleId)
+                .orElseThrow(() -> new ArticleNotFoundException("Not found such article"));
 
-        if (articleEntity.isPresent()) {
-            ArticleEntity article = articleEntity.get();
+        Integer userId = articleEntity.getUserId();
+        Integer count = articleEntity.getReadCount();
+        articleEntity.setReadCount(count + 1);
 
-            Integer userId = article.getUserId();
-            Integer count = article.getReadCount();
-            article.setReadCount(count + 1);
-
-            msAuthClient.addPopularity(userId);
-            articleRepository.save(article);
-        } else {
-            throw new ArticleNotFoundException("Not found such article");
-        }
+        msAuthClient.addPopularity(userId);
+        articleRepository.save(articleEntity);
 
         logger.info("ActionLog.addReadCount.stop.success");
     }
