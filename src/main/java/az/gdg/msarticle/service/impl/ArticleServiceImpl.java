@@ -6,7 +6,6 @@ import az.gdg.msarticle.exception.NoSuchArticleException;
 import az.gdg.msarticle.exception.NotValidTokenException;
 import az.gdg.msarticle.model.entity.ArticleEntity;
 import az.gdg.msarticle.repository.ArticleRepository;
-import az.gdg.msarticle.repository.CommentRepository;
 import az.gdg.msarticle.service.ArticleService;
 import az.gdg.msarticle.service.MsAuthService;
 import org.slf4j.Logger;
@@ -20,14 +19,11 @@ import org.springframework.stereotype.Service;
 public class ArticleServiceImpl implements ArticleService {
     private static final Logger logger = LoggerFactory.getLogger(ArticleServiceImpl.class);
     private final ArticleRepository articleRepository;
-    private final CommentRepository commentRepository;
     private final MsAuthService msAuthService;
 
 
-    public ArticleServiceImpl(ArticleRepository articleRepository, CommentRepository commentRepository,
-                              MsAuthService msAuthService) {
+    public ArticleServiceImpl(ArticleRepository articleRepository, MsAuthService msAuthService) {
         this.articleRepository = articleRepository;
-        this.commentRepository = commentRepository;
         this.msAuthService = msAuthService;
     }
 
