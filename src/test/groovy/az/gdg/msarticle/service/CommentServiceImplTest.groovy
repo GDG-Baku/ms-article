@@ -2,6 +2,7 @@ package az.gdg.msarticle.service
 
 import az.gdg.msarticle.exception.ArticleNotFoundException
 import az.gdg.msarticle.exception.CommentNotFoundException
+import az.gdg.msarticle.exception.InvalidTokenException
 import az.gdg.msarticle.exception.NotAllowedException
 import az.gdg.msarticle.mapper.CommentMapper
 import az.gdg.msarticle.model.CommentRequest
@@ -146,4 +147,35 @@ class CommentServiceImplTest extends Specification {
 
 
     }
+
+    def "should throw InvalidTokenException if token is invalid"() {
+        given:
+            def userAuthentication = null
+            SecurityContextHolder.getContext().setAuthentication(userAuthentication)
+
+        when:
+            commentService.getAuthenticatedObject()
+
+        then:
+            thrown(InvalidTokenException)
+
+
+    }
+
+    def "get authenticated object if token is valid"() {
+        given:
+            def userAuthentication = new UserAuthentication("1", true)
+            SecurityContextHolder.getContext().setAuthentication(userAuthentication)
+
+        when:
+            commentService.getAuthenticatedObject()
+
+        then:
+            SecurityContextHolder.getContext().getAuthentication() == userAuthentication
+            notThrown(InvalidTokenException)
+
+
+    }
+
+
 }

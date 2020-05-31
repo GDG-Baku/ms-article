@@ -15,7 +15,6 @@ swagger:
 
 service:
   url:
-    ms-auth: http://localhost:8081
-#https://gdg-ms-auth.herokuapp.com
+    ms-auth: https://gdg-ms-auth.herokuapp.com
 
 
