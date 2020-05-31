@@ -83,6 +83,17 @@ class CommentServiceImplTest extends Specification {
     }
 
 
+    def "should return authenticated object"() {
+        given:
+            def userAuthentication = new UserAuthentication("1", true)
+            SecurityContextHolder.getContext().setAuthentication(userAuthentication)
+        when:
+            commentService.getAuthenticatedObject()
+        then:
+            notThrown(InvalidTokenException)
+    }
+
+
     def "should throw InvalidTokenException when calling getAuthenticatedObject method"() {
         given:
             def userAuthentication = null
