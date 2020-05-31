@@ -46,7 +46,7 @@ public class ArticleServiceImpl implements ArticleService {
                     logger.error("Thrown.UnauthorizedAccessException");
                     throw new UnauthorizedAccessException("You don't have permission to get the article");
                 }
-            } catch (RuntimeException e) {
+            } catch (NotValidTokenException e) {
                 logger.error("Thrown.UnauthorizedAccessException");
                 throw new UnauthorizedAccessException("You don't have permission to get the article");
             }
