@@ -37,7 +37,7 @@ public class ArticleServiceImpl implements ArticleService {
         ArticleEntity articleEntity = articleRepository.findById(articleID)
                 .orElseThrow(() -> new NoSuchArticleException("Article doesn't exist"));
         Integer articleUserId = articleEntity.getUserId();
-        if (userId == articleUserId) {
+        if (articleUserId.equals(userId)) {
             // deleting comments and replies before delete article - start
             List<CommentEntity> commentEntityList = articleEntity.getComments();
             for (CommentEntity commentEntity : commentEntityList) {
