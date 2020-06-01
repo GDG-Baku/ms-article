@@ -1,5 +1,6 @@
 package az.gdg.msarticle.service
 
+import az.gdg.msarticle.exception.NoSuchArticleException
 import az.gdg.msarticle.exception.UnauthorizedAccessException
 import az.gdg.msarticle.mapper.ArticleMapper
 import az.gdg.msarticle.mapper.CommentMapper
@@ -56,20 +57,13 @@ class ArticleServiceTest extends Specification {
     def "should throw NoSuchArticleException if no such article"() {
         given:
             def articleId = "dasdpksapdksaop"
-            def tag = new TagEntity()
-            def comment = new CommentEntity()
-            def articleEntity = new ArticleEntity(id: "5eac708be7179a42f172de4c", type: new Integer(2), userId: 41, title: "Test Title",
-                    content: "Code Block", createdAt: LocalDateTime.now(), updatedAt: LocalDateTime.now(), quackCount: 30,
-                    hateCount: 5, readCount: 75, isDraft: true, isApproved: false, approverId: 41, tags: [tag], comments: [comment])
-            def userAuthentication = null
-            SecurityContextHolder.getContext().setAuthentication(userAuthentication)
         
         when:
             articleServiceImpl.getArticleById(articleId)
         
         then:
-            1 * articleRepository.findById(articleId) >> Optional.of(articleEntity)
-            thrown(UnauthorizedAccessException)
+            1 * articleRepository.findById(articleId) >> Optional.empty()
+            thrown(NoSuchArticleException)
     }
     
     def "should throw UnauthorizedAccessException if not logged and article is draft"() {
