@@ -34,8 +34,8 @@ public class ArticleServiceImpl implements ArticleService {
         int userId = Integer.parseInt((String) getAuthenticatedObject().getPrincipal());
         ArticleEntity articleEntity = articleRepository.findById(articleID)
                 .orElseThrow(() -> new NoSuchArticleException("Article doesn't exist"));
-        int articleUserId = articleEntity.getUserId();
-        int remainingQuackCount = msAuthService.getRemainingQuackCount(token);
+        Integer articleUserId = articleEntity.getUserId();
+        Integer remainingQuackCount = msAuthService.getRemainingQuackCount(token);
         if (userId != articleUserId && getAuthenticatedObject().isAuthenticated()) {
             if (remainingQuackCount > 0) {
                 articleEntity.setQuackCount(articleEntity.getQuackCount() + 1);
