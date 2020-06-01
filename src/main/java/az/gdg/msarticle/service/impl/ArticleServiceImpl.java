@@ -31,12 +31,12 @@ public class ArticleServiceImpl implements ArticleService {
     @Override
     public void addQuackByArticleId(String articleID, String token) {
         logger.info("ActionLog.addQuackByArticleId.start");
-        int userId = Integer.parseInt((String) getAuthenticatedObject().getPrincipal());
+        Integer userId = Integer.parseInt((String) getAuthenticatedObject().getPrincipal());
         ArticleEntity articleEntity = articleRepository.findById(articleID)
                 .orElseThrow(() -> new NoSuchArticleException("Article doesn't exist"));
         Integer articleUserId = articleEntity.getUserId();
         Integer remainingQuackCount = msAuthService.getRemainingQuackCount(token);
-        if (userId != articleUserId && getAuthenticatedObject().isAuthenticated()) {
+        if (!articleUserId.equals(userId) && getAuthenticatedObject().isAuthenticated()) {
             if (remainingQuackCount > 0) {
                 articleEntity.setQuackCount(articleEntity.getQuackCount() + 1);
                 articleRepository.save(articleEntity);
