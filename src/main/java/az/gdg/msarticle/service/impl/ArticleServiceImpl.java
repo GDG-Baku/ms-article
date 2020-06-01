@@ -1,9 +1,9 @@
 package az.gdg.msarticle.service.impl;
 
 import az.gdg.msarticle.exception.ExceedLimitException;
-import az.gdg.msarticle.exception.NoAccessException;
 import az.gdg.msarticle.exception.NoSuchArticleException;
 import az.gdg.msarticle.exception.NotValidTokenException;
+import az.gdg.msarticle.exception.UnauthorizedAccessException;
 import az.gdg.msarticle.model.entity.ArticleEntity;
 import az.gdg.msarticle.repository.ArticleRepository;
 import az.gdg.msarticle.service.ArticleService;
@@ -46,8 +46,8 @@ public class ArticleServiceImpl implements ArticleService {
                 throw new ExceedLimitException("You've already used your daily quacks");
             }
         } else {
-            logger.error("Thrown.NoAccessException");
-            throw new NoAccessException("You don't have access to quack");
+            logger.error("Thrown.UnauthorizedAccessException");
+            throw new UnauthorizedAccessException("You don't have access to quack");
         }
     }
 
