@@ -38,7 +38,6 @@ class ArticleServiceTest extends Specification {
                     hateCount: 5, readCount: 75, isDraft: false, isApproved: true, approverId: 41, tags: [tag], comments: [comment])
             def userAuthentication = new UserAuthentication("15", true, "USER")
             SecurityContextHolder.getContext().setAuthentication(userAuthentication)
-            articleEntity.quackCount = articleEntity.quackCount + 1
         
         when:
             articleServiceImpl.addQuackByArticleId(articleId, token)
@@ -48,7 +47,7 @@ class ArticleServiceTest extends Specification {
             1 * msAuthService.getRemainingQuackCount(token) >> remainingQuackCount
             1 * articleRepository.save(articleEntity)
             1 * msAuthService.updateRemainingQuackCount(token)
-            articleEntity.quackCount == 32
+            articleEntity.quackCount == 31
     }
     
     def "should throw NoSuchArticleException if no such article"() {
