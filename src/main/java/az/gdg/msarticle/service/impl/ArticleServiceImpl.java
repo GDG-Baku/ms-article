@@ -1,12 +1,11 @@
 package az.gdg.msarticle.service.impl;
 
 import az.gdg.msarticle.exception.ExceedLimitException;
-import az.gdg.msarticle.exception.NoAccessException;
 import az.gdg.msarticle.exception.NoSuchArticleException;
 import az.gdg.msarticle.exception.NotValidTokenException;
+import az.gdg.msarticle.exception.UnauthorizedAccessException;
 import az.gdg.msarticle.model.entity.ArticleEntity;
 import az.gdg.msarticle.repository.ArticleRepository;
-import az.gdg.msarticle.repository.CommentRepository;
 import az.gdg.msarticle.service.ArticleService;
 import az.gdg.msarticle.service.MsAuthService;
 import org.slf4j.Logger;
@@ -20,14 +19,11 @@ import org.springframework.stereotype.Service;
 public class ArticleServiceImpl implements ArticleService {
     private static final Logger logger = LoggerFactory.getLogger(ArticleServiceImpl.class);
     private final ArticleRepository articleRepository;
-    private final CommentRepository commentRepository;
     private final MsAuthService msAuthService;
 
 
-    public ArticleServiceImpl(ArticleRepository articleRepository, CommentRepository commentRepository,
-                              MsAuthService msAuthService) {
+    public ArticleServiceImpl(ArticleRepository articleRepository, MsAuthService msAuthService) {
         this.articleRepository = articleRepository;
-        this.commentRepository = commentRepository;
         this.msAuthService = msAuthService;
     }
 
@@ -35,12 +31,12 @@ public class ArticleServiceImpl implements ArticleService {
     @Override
     public void addHateByArticleId(String articleID, String token) {
         logger.info("ActionLog.addHateByArticleId.start");
-        int userId = Integer.parseInt((String) getAuthenticatedObject().getPrincipal());
+        Integer userId = Integer.parseInt((String) getAuthenticatedObject().getPrincipal());
         ArticleEntity articleEntity = articleRepository.findById(articleID)
                 .orElseThrow(() -> new NoSuchArticleException("Article doesn't exist"));
-        int articleUserId = articleEntity.getUserId();
-        int remainingQuackCount = msAuthService.getRemainingHateCount(token);
-        if (userId != articleUserId && getAuthenticatedObject().isAuthenticated()) {
+        Integer articleUserId = articleEntity.getUserId();
+        Integer remainingQuackCount = msAuthService.getRemainingHateCount(token);
+        if (articleUserId.equals(userId) && getAuthenticatedObject().isAuthenticated()) {
             if (remainingQuackCount > 0) {
                 articleEntity.setHateCount(articleEntity.getHateCount() + 1);
                 articleRepository.save(articleEntity);
@@ -50,8 +46,8 @@ public class ArticleServiceImpl implements ArticleService {
                 throw new ExceedLimitException("You've already used your daily hates");
             }
         } else {
-            logger.error("Thrown.NoAccessException");
-            throw new NoAccessException("You don't have access to hate");
+            logger.error("Thrown.UnauthorizedAccessException");
+            throw new UnauthorizedAccessException("You don't have access to hate");
         }
     }
 
