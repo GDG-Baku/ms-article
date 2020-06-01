@@ -1,7 +1,6 @@
 package az.gdg.msarticle.service.impl;
 
 import az.gdg.msarticle.exception.InvalidTokenException;
-import az.gdg.msarticle.exception.InvalidTypeException;
 import az.gdg.msarticle.mapper.ArticleMapper;
 import az.gdg.msarticle.model.ArticleRequest;
 import az.gdg.msarticle.model.entity.ArticleEntity;
@@ -13,6 +12,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+
+import java.util.Collections;
 
 @Service
 public class ArticleServiceImpl implements ArticleService {
@@ -36,27 +37,23 @@ public class ArticleServiceImpl implements ArticleService {
     @Override
     public String addDraft(String token, ArticleRequest articleRequest) {
         logger.info("ActionLog.addDraft.start");
-        if (articleRequest.getType().equals("ARTICLE")) {
-            String userId = (String) getAuthenticatedObject().getPrincipal();
+        String userId = (String) getAuthenticatedObject().getPrincipal();
 
-            ArticleEntity draft = ArticleMapper.INSTANCE.requestToEntity(articleRequest);
-            draft.setUserId(Integer.parseInt(userId));
-            draft.setDraft(true);
-            draft.setReadCount(0);
-            draft.setHateCount(0);
-            draft.setQuackCount(0);
-            draft.setApproved(false);
-            draft.setApproverId(null);
-            draft.setComments(null);
-            tagRepository.saveAll(draft.getTags());
-            articleRepository.save(draft);
+        ArticleEntity draft = ArticleMapper.INSTANCE.requestToEntity(articleRequest);
+        draft.setUserId(Integer.parseInt(userId));
+        draft.setDraft(true);
+        draft.setReadCount(0);
+        draft.setHateCount(0);
+        draft.setQuackCount(0);
+        draft.setApproved(false);
+        draft.setApproverId(null);
+        draft.setComments(Collections.emptyList());
+        tagRepository.saveAll(draft.getTags());
+        articleRepository.save(draft);
 
-            logger.info("ActionLog.addDraft.stop.success");
+        logger.info("ActionLog.addDraft.stop.success");
 
-            return draft.getId();
-        } else {
-            throw new InvalidTypeException("Not allowed enter the type different from ARTICLE!");
-        }
+        return draft.getId();
 
 
     }
