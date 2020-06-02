@@ -77,7 +77,7 @@ class ArticleServiceTest extends Specification {
             thrown(NotValidTokenException)
     }
     
-    def "should throw NotValidTokenException if it's own article"() {
+    def "should throw UnauthorizedAccessException if it's own article"() {
         given:
             def articleId = "5eac708be7179a42f172de4c"
             def token = "wdasadadada"

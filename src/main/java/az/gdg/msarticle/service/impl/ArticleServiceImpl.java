@@ -36,7 +36,7 @@ public class ArticleServiceImpl implements ArticleService {
                 .orElseThrow(() -> new NoSuchArticleException("Article doesn't exist"));
         Integer articleUserId = articleEntity.getUserId();
         Integer remainingQuackCount = msAuthService.getRemainingHateCount(token);
-        if (articleUserId.equals(userId) && getAuthenticatedObject().isAuthenticated()) {
+        if (!articleUserId.equals(userId) && getAuthenticatedObject().isAuthenticated()) {
             if (remainingQuackCount > 0) {
                 articleEntity.setHateCount(articleEntity.getHateCount() + 1);
                 articleRepository.save(articleEntity);
