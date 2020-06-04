@@ -58,7 +58,6 @@ class ArticleServiceTest extends Specification {
             
             res.articleDTOs == articleDTOs
             res.userDTO == userDTO
-            res.articleDTOs.size() == 2
     }
     
     def "should use the repository to fetch non-draft and approved articles by UserId if it's not own account"() {
