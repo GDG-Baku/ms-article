@@ -1,6 +1,7 @@
 package az.gdg.msarticle.service.impl;
 
 import az.gdg.msarticle.exception.NotValidTokenException;
+import az.gdg.msarticle.exception.UnauthorizedAccessException;
 import az.gdg.msarticle.mapper.ArticleMapper;
 import az.gdg.msarticle.model.dto.ArticleDTO;
 import az.gdg.msarticle.model.dto.UserArticleDTO;
@@ -36,13 +37,15 @@ public class ArticleServiceImpl implements ArticleService {
     @Override
     public UserArticleDTO getArticlesByUserId(Integer userId, int page) {
         logger.info("ActionLog.getArticlesByUserId.start with userId {}", userId);
-        List<ArticleEntity> articleEntities = null;
+        List<ArticleEntity> articleEntities;
         Pageable pageable = PageRequest.of(page, 5, Sort.by("createdAt").descending());
         try {
             if (Integer.parseInt(getAuthenticatedObject().getPrincipal().toString()) == userId) {
                 articleEntities = articleRepository.getArticleEntitiesByUserId(userId, pageable).getContent();
+            } else {
+                throw new UnauthorizedAccessException("It's not your article");
             }
-        } catch (NotValidTokenException e) {
+        } catch (NotValidTokenException | UnauthorizedAccessException e) {
             articleEntities = articleRepository
                     .getArticleEntitiesByUserIdAndIsDraftFalseAndIsApprovedTrue(userId, pageable).getContent();
         }
