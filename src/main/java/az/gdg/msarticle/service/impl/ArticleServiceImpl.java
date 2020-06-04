@@ -2,6 +2,7 @@ package az.gdg.msarticle.service.impl;
 
 import az.gdg.msarticle.exception.ArticleNotFoundException;
 import az.gdg.msarticle.exception.NoAccessException;
+import az.gdg.msarticle.exception.NoDraftedArticleExist;
 import az.gdg.msarticle.exception.NotValidTokenException;
 import az.gdg.msarticle.mail.service.EmailService;
 import az.gdg.msarticle.model.entity.ArticleEntity;
@@ -42,13 +43,13 @@ public class ArticleServiceImpl implements ArticleService {
         ArticleEntity articleEntity = articleRepository.findById(articleId)
                 .orElseThrow(() -> new ArticleNotFoundException("Article doesn't exist with this id" + articleId));
 
-        if (articleEntity.getUserId() == Integer.parseInt(userId)) {
+        if (String.valueOf(articleEntity.getUserId()).equals(userId)) {
             if (articleEntity.isDraft()) {
                 sendMail(articleId, "publish");
                 logger.info("ActionLog.publishArticle.success");
                 message = "Article is sent for reviewing";
             } else {
-                message = "Article is already published";
+                throw new NoDraftedArticleExist("Article is already published");
             }
             return message;
         }
