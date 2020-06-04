@@ -3,10 +3,11 @@ package az.gdg.msarticle.service.impl;
 import az.gdg.msarticle.exception.ArticleNotFoundException;
 import az.gdg.msarticle.exception.InvalidTokenException;
 import az.gdg.msarticle.exception.NoAccessException;
-import az.gdg.msarticle.mapper.ArticleMapper;
+import az.gdg.msarticle.exception.TypeNotFoundException;
 import az.gdg.msarticle.mapper.TagMapper;
 import az.gdg.msarticle.model.ArticleRequest;
 import az.gdg.msarticle.model.TagRequest;
+import az.gdg.msarticle.model.TypeEnum;
 import az.gdg.msarticle.model.entity.ArticleEntity;
 import az.gdg.msarticle.model.entity.TagEntity;
 import az.gdg.msarticle.repository.ArticleRepository;
@@ -51,10 +52,7 @@ public class ArticleServiceImpl implements ArticleService {
         String message;
 
         if (articleEntity.getUserId() == Integer.parseInt(userId)) {
-            articleEntity = ArticleMapper.INSTANCE.requestToEntity(articleRequest);
-            articleEntity.setTags(getTagsFromRequest(articleRequest.getTags()));
-            articleEntity.setDraft(true);
-            articleRepository.save(articleEntity);
+            articleRepository.save(buildEntityFromRequest(articleEntity, articleRequest));
             sendMail(articleId, "update");
             message = "Article is sent for reviewing";
             logger.info("ActionLog.updateArticle.success with id {}", articleId);
@@ -63,6 +61,25 @@ public class ArticleServiceImpl implements ArticleService {
         }
         logger.info("ActionLog.updateArticle.end with id {}", articleId);
         return message;
+    }
+
+    private ArticleEntity buildEntityFromRequest(ArticleEntity articleEntity,
+                                                 ArticleRequest articleRequest) {
+        articleEntity.setType(getValueOfType(articleRequest.getType()));
+        articleEntity.setTitle(articleRequest.getTitle());
+        articleEntity.setContent(articleRequest.getContent());
+        articleEntity.setTags(getTagsFromRequest(articleRequest.getTags()));
+        articleEntity.setDraft(true);
+        return articleEntity;
+    }
+
+    private Integer getValueOfType(String type) {
+        for (TypeEnum typeEnum : TypeEnum.values()) {
+            if (typeEnum.name().equalsIgnoreCase(type)) {
+                return typeEnum.getValue();
+            }
+        }
+        throw new TypeNotFoundException("Please, specify valid type");
     }
 
     private List<TagEntity> getTagsFromRequest(List<TagRequest> tagRequests) {
