@@ -94,14 +94,13 @@ class ArticleServiceImplTest extends Specification {
             notThrown(InvalidTokenException)
     }
 
-    def "should throw NotValidTokenException when calling getAuthenticatedObject method"() {
+    def "should throw InvalidTokenException when user is not authenticate"() {
         given:
             def userAuthentication = null
             SecurityContextHolder.getContext().setAuthentication(userAuthentication)
         when:
             articleService.getAuthenticatedObject()
         then:
-            0 * SecurityContextHolder.getContext().getAuthentication()
             thrown(InvalidTokenException)
     }
 }
