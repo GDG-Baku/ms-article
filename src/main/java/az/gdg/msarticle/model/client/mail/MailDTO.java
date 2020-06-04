@@ -1,4 +1,4 @@
-package az.gdg.msarticle.mail.model;
+package az.gdg.msarticle.model.client.mail;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
