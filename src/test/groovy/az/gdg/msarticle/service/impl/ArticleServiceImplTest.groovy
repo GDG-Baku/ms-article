@@ -1,10 +1,9 @@
 package az.gdg.msarticle.service.impl
 
 import az.gdg.msarticle.exception.ArticleNotFoundException
+import az.gdg.msarticle.exception.InvalidTokenException
 import az.gdg.msarticle.exception.NoAccessException
 import az.gdg.msarticle.exception.NoDraftedArticleExist
-import az.gdg.msarticle.exception.NotValidTokenException
-import az.gdg.msarticle.mail.service.impl.EmailServiceImpl
 import az.gdg.msarticle.model.entity.ArticleEntity
 import az.gdg.msarticle.repository.ArticleRepository
 import az.gdg.msarticle.security.UserAuthentication
@@ -14,13 +13,13 @@ import spock.lang.Specification
 class ArticleServiceImplTest extends Specification {
 
     def articleRepository
-    def emailService
+    def mailService
     def articleService
 
     void setup() {
         articleRepository = Mock(ArticleRepository)
-        emailService = Mock(EmailServiceImpl)
-        articleService = new ArticleServiceImpl(articleRepository, emailService)
+        mailService = Mock(MailServiceImpl)
+        articleService = new ArticleServiceImpl(articleRepository, mailService)
     }
 
     def "should send email while trying to publish article"() {
@@ -36,7 +35,10 @@ class ArticleServiceImplTest extends Specification {
         when:
             articleService.publishArticle(articleId)
         then:
-            1 * emailService.sendToQueue(_)
+            1 * mailService.sendToQueue(_)
+            notThrown(exception)
+        where:
+            exception << [ArticleNotFoundException, NoAccessException, NoDraftedArticleExist]
     }
 
     def "should throw NoAccessException when not authorized user tries to publish"() {
@@ -89,7 +91,7 @@ class ArticleServiceImplTest extends Specification {
         when:
             articleService.getAuthenticatedObject()
         then:
-            notThrown(NotValidTokenException)
+            notThrown(InvalidTokenException)
     }
 
     def "should throw NotValidTokenException when calling getAuthenticatedObject method"() {
@@ -100,6 +102,6 @@ class ArticleServiceImplTest extends Specification {
             articleService.getAuthenticatedObject()
         then:
             0 * SecurityContextHolder.getContext().getAuthentication()
-            thrown(NotValidTokenException)
+            thrown(InvalidTokenException)
     }
 }

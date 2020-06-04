@@ -1,13 +1,14 @@
 package az.gdg.msarticle.service.impl;
 
 import az.gdg.msarticle.exception.ArticleNotFoundException;
+import az.gdg.msarticle.exception.InvalidTokenException;
 import az.gdg.msarticle.exception.NoAccessException;
 import az.gdg.msarticle.exception.NoDraftedArticleExist;
-import az.gdg.msarticle.exception.NotValidTokenException;
-import az.gdg.msarticle.mail.service.EmailService;
 import az.gdg.msarticle.model.entity.ArticleEntity;
 import az.gdg.msarticle.repository.ArticleRepository;
 import az.gdg.msarticle.service.ArticleService;
+import az.gdg.msarticle.service.MailService;
+import az.gdg.msarticle.util.MailUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,17 +21,17 @@ public class ArticleServiceImpl implements ArticleService {
 
     private static final Logger logger = LoggerFactory.getLogger(ArticleServiceImpl.class);
     private final ArticleRepository articleRepository;
-    private final EmailService emailService;
+    private final MailService mailService;
     private static final String NO_ACCESS_TO_REQUEST = "You don't have access for this request";
 
-    public ArticleServiceImpl(ArticleRepository articleRepository, EmailService emailService) {
+    public ArticleServiceImpl(ArticleRepository articleRepository, MailService mailService) {
         this.articleRepository = articleRepository;
-        this.emailService = emailService;
+        this.mailService = mailService;
     }
 
     private Authentication getAuthenticatedObject() {
         if (SecurityContextHolder.getContext().getAuthentication() == null) {
-            throw new NotValidTokenException("Token is not valid or it is expired");
+            throw new InvalidTokenException("Token is not valid or it is expired");
         }
         return SecurityContextHolder.getContext().getAuthentication();
     }
@@ -62,7 +63,7 @@ public class ArticleServiceImpl implements ArticleService {
         logger.info("ActionLog.sendMail.start");
         String mailBody = "Author that has article with id " + articleId + " wants to " + requestType + " it.<br>" +
                 "Please review article before " + requestType;
-        emailService.sendToQueue(emailService.prepareMail(mailBody));
+        mailService.sendToQueue(MailUtil.buildMail(mailBody));
         logger.info("ActionLog.sendMail.end");
     }
 }
