@@ -7,22 +7,21 @@ import az.gdg.msarticle.exception.TypeNotFoundException
 import az.gdg.msarticle.model.ArticleRequest
 import az.gdg.msarticle.model.entity.ArticleEntity
 import az.gdg.msarticle.repository.ArticleRepository
-import az.gdg.msarticle.repository.TagRepository
 import az.gdg.msarticle.security.UserAuthentication
 import org.springframework.security.core.context.SecurityContextHolder
 import spock.lang.Specification
 
 class ArticleServiceImplTest extends Specification {
     def articleRepository
-    def tagRepository
+    def tagService
     def mailService
     def articleService
 
     void setup() {
         articleRepository = Mock(ArticleRepository)
-        tagRepository = Mock(TagRepository)
+        tagService = Mock(TagServiceImpl)
         mailService = Mock(MailServiceImpl)
-        articleService = new ArticleServiceImpl(articleRepository, tagRepository, mailService)
+        articleService = new ArticleServiceImpl(articleRepository, mailService, tagService)
     }
 
     def "should update article"() {
@@ -115,5 +114,4 @@ class ArticleServiceImplTest extends Specification {
         then:
             thrown(TypeNotFoundException)
     }
-
 }

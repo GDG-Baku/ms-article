@@ -4,20 +4,14 @@ import az.gdg.msarticle.exception.ArticleNotFoundException;
 import az.gdg.msarticle.exception.InvalidTokenException;
 import az.gdg.msarticle.exception.NoAccessException;
 import az.gdg.msarticle.exception.TypeNotFoundException;
-import az.gdg.msarticle.mapper.TagMapper;
 import az.gdg.msarticle.model.ArticleRequest;
-import az.gdg.msarticle.model.TagRequest;
 import az.gdg.msarticle.model.TypeEnum;
 import az.gdg.msarticle.model.entity.ArticleEntity;
-import az.gdg.msarticle.model.entity.TagEntity;
 import az.gdg.msarticle.repository.ArticleRepository;
-import az.gdg.msarticle.repository.TagRepository;
 import az.gdg.msarticle.service.ArticleService;
 import az.gdg.msarticle.service.MailService;
+import az.gdg.msarticle.service.TagService;
 import az.gdg.msarticle.util.MailUtil;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,16 +23,15 @@ import org.springframework.stereotype.Service;
 public class ArticleServiceImpl implements ArticleService {
     private static final Logger logger = LoggerFactory.getLogger(ArticleServiceImpl.class);
     private final ArticleRepository articleRepository;
-    private final TagRepository tagRepository;
     private final MailService mailService;
+    private final TagService tagService;
     private static final String NO_ACCESS_TO_REQUEST = "You don't have access for this request";
 
     public ArticleServiceImpl(ArticleRepository articleRepository,
-                              TagRepository tagRepository,
-                              MailService mailService) {
+                              MailService mailService, TagService tagService) {
         this.articleRepository = articleRepository;
-        this.tagRepository = tagRepository;
         this.mailService = mailService;
+        this.tagService = tagService;
     }
 
     @Override
@@ -68,7 +61,7 @@ public class ArticleServiceImpl implements ArticleService {
         articleEntity.setType(getValueOfType(articleRequest.getType()));
         articleEntity.setTitle(articleRequest.getTitle());
         articleEntity.setContent(articleRequest.getContent());
-        articleEntity.setTags(getTagsFromRequest(articleRequest.getTags()));
+        articleEntity.setTags(tagService.getTagsFromRequest(articleRequest.getTags()));
         articleEntity.setDraft(true);
         return articleEntity;
     }
@@ -80,20 +73,6 @@ public class ArticleServiceImpl implements ArticleService {
             }
         }
         throw new TypeNotFoundException("Please, specify valid type");
-    }
-
-    private List<TagEntity> getTagsFromRequest(List<TagRequest> tagRequests) {
-        logger.info("ActionLog.getTagsFromRequest.start");
-        List<TagEntity> tags = new ArrayList<>();
-        for (TagRequest tagRequest : tagRequests) {
-            TagEntity tagEntity = tagRepository.findByName(tagRequest.getName());
-            if (tagEntity == null) {
-                tagEntity = tagRepository.save(TagMapper.INSTANCE.requestToEntity(tagRequest));
-            }
-            tags.add(tagEntity);
-        }
-        logger.info("ActionLog.getTagsFromRequest.end");
-        return tags;
     }
 
     private void sendMail(String articleId, String requestType) {
