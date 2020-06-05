@@ -1,7 +1,6 @@
 package az.gdg.msarticle.service.impl
 
 import az.gdg.msarticle.exception.CommentNotFoundException
-import az.gdg.msarticle.exception.InvalidTokenException
 import az.gdg.msarticle.exception.NoAccessException
 import az.gdg.msarticle.model.entity.CommentEntity
 import az.gdg.msarticle.repository.CommentRepository
@@ -81,28 +80,4 @@ class CommentServiceImplTest extends Specification {
         then:
             thrown(CommentNotFoundException)
     }
-
-
-    def "should return authenticated object"() {
-        given:
-            def userAuthentication = new UserAuthentication("1", true)
-            SecurityContextHolder.getContext().setAuthentication(userAuthentication)
-        when:
-            commentService.getAuthenticatedObject()
-        then:
-            notThrown(InvalidTokenException)
-    }
-
-
-    def "should throw InvalidTokenException when user is not authenticated"() {
-        given:
-            def userAuthentication = null
-            SecurityContextHolder.getContext().setAuthentication(userAuthentication)
-        when:
-            commentService.getAuthenticatedObject()
-        then:
-            thrown(InvalidTokenException)
-
-    }
-
 }

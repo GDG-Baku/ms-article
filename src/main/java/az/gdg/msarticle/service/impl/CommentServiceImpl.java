@@ -1,16 +1,14 @@
 package az.gdg.msarticle.service.impl;
 
 import az.gdg.msarticle.exception.CommentNotFoundException;
-import az.gdg.msarticle.exception.InvalidTokenException;
 import az.gdg.msarticle.exception.NoAccessException;
 import az.gdg.msarticle.model.entity.CommentEntity;
 import az.gdg.msarticle.repository.CommentRepository;
 import az.gdg.msarticle.service.CommentService;
+import az.gdg.msarticle.util.AuthUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -23,19 +21,12 @@ public class CommentServiceImpl implements CommentService {
         this.commentRepository = commentRepository;
     }
 
-    private Authentication getAuthenticatedObject() {
-        if (SecurityContextHolder.getContext().getAuthentication() == null) {
-            throw new InvalidTokenException("Token is not valid or it is expired");
-        }
-        return SecurityContextHolder.getContext().getAuthentication();
-    }
-
     @Override
     public String deleteComment(String id) {
         logger.info("ActionLog.deleteComment.start with id {}", id);
         String message;
 
-        String userId = (String) getAuthenticatedObject().getPrincipal();
+        String userId = (String) AuthUtil.getAuthenticatedObject().getPrincipal();
 
         CommentEntity commentEntity = commentRepository.findById(id).orElseThrow(() ->
                 new CommentNotFoundException("Comment doesn't exist with this id " + id));
