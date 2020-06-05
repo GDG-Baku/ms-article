@@ -46,7 +46,7 @@ public class ArticleServiceImpl implements ArticleService {
 
         if (String.valueOf(articleEntity.getUserId()).equals(userId)) {
             if (articleEntity.isDraft()) {
-                sendMail(articleId, "publish");
+                MailUtil.sendMail(articleId, "publish", mailService);
                 logger.info("ActionLog.publishArticle.success");
                 message = "Article is sent for reviewing";
             } else {
@@ -56,14 +56,5 @@ public class ArticleServiceImpl implements ArticleService {
         }
         logger.info("ActionLog.publishArticle.end");
         throw new NoAccessException(NO_ACCESS_TO_REQUEST);
-    }
-
-
-    private void sendMail(String articleId, String requestType) {
-        logger.info("ActionLog.sendMail.start");
-        String mailBody = "Author that has article with id " + articleId + " wants to " + requestType + " it.<br>" +
-                "Please review article before " + requestType;
-        mailService.sendToQueue(MailUtil.buildMail(mailBody));
-        logger.info("ActionLog.sendMail.end");
     }
 }
