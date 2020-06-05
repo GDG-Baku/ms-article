@@ -46,7 +46,7 @@ public class ArticleServiceImpl implements ArticleService {
 
         if (articleEntity.getUserId() == Integer.parseInt(userId)) {
             articleRepository.save(buildEntityFromRequest(articleEntity, articleRequest));
-            sendMail(articleId, "update");
+            MailUtil.sendMail(articleId, "update", mailService);
             message = "Article is sent for reviewing";
             logger.info("ActionLog.updateArticle.success with id {}", articleId);
         } else {
@@ -73,14 +73,6 @@ public class ArticleServiceImpl implements ArticleService {
             }
         }
         throw new TypeNotFoundException("Please, specify valid type");
-    }
-
-    private void sendMail(String articleId, String requestType) {
-        logger.info("ActionLog.sendMail.start");
-        String mailBody = "Author that has article with id " + articleId + " wants to " + requestType + " it.<br>" +
-                "Please review article before " + requestType;
-        mailService.sendToQueue(MailUtil.buildMail(mailBody));
-        logger.info("ActionLog.sendMail.end");
     }
 
     private Authentication getAuthenticatedObject() {
