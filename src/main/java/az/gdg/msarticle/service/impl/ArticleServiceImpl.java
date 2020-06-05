@@ -5,8 +5,8 @@ import az.gdg.msarticle.mapper.ArticleMapper;
 import az.gdg.msarticle.model.ArticleRequest;
 import az.gdg.msarticle.model.entity.ArticleEntity;
 import az.gdg.msarticle.repository.ArticleRepository;
-import az.gdg.msarticle.repository.TagRepository;
 import az.gdg.msarticle.service.ArticleService;
+import az.gdg.msarticle.service.TagService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
@@ -20,11 +20,11 @@ public class ArticleServiceImpl implements ArticleService {
 
     private static final Logger logger = LoggerFactory.getLogger(ArticleServiceImpl.class);
     private final ArticleRepository articleRepository;
-    private final TagRepository tagRepository;
+    private final TagService tagService;
 
-    public ArticleServiceImpl(ArticleRepository articleRepository, TagRepository tagRepository) {
+    public ArticleServiceImpl(ArticleRepository articleRepository, TagService tagService) {
         this.articleRepository = articleRepository;
-        this.tagRepository = tagRepository;
+        this.tagService = tagService;
     }
 
     private Authentication getAuthenticatedObject() {
@@ -48,7 +48,13 @@ public class ArticleServiceImpl implements ArticleService {
         draft.setApproved(false);
         draft.setApproverId(null);
         draft.setComments(Collections.emptyList());
-        tagRepository.saveAll(draft.getTags());
+
+        if (articleRequest.getType().equals("NEWS")) {
+            draft.setTags(Collections.emptyList());
+        } else {
+            draft.setTags(tagService.getTagsFromRequest(articleRequest.getTags()));
+        }
+
         articleRepository.save(draft);
 
         logger.info("ActionLog.addDraft.stop.success");

@@ -4,8 +4,8 @@ import az.gdg.msarticle.exception.InvalidTokenException
 import az.gdg.msarticle.mapper.ArticleMapper
 import az.gdg.msarticle.model.ArticleRequest
 import az.gdg.msarticle.repository.ArticleRepository
-import az.gdg.msarticle.repository.TagRepository
 import az.gdg.msarticle.security.UserAuthentication
+import az.gdg.msarticle.service.TagService
 import org.springframework.security.core.context.SecurityContextHolder
 import spock.lang.Specification
 import spock.lang.Title
@@ -14,20 +14,20 @@ import spock.lang.Title
 class ArticleServiceImplTest extends Specification {
 
     ArticleRepository articleRepository
-    TagRepository tagRepository
+    TagService tagService
     ArticleServiceImpl articleService
 
     def setup() {
         articleRepository = Mock()
-        tagRepository = Mock()
-        articleService = new ArticleServiceImpl(articleRepository, tagRepository)
+        tagService = Mock()
+        articleService = new ArticleServiceImpl(articleRepository, tagService)
     }
 
-    def "add draft"() {
+    def "set empty list if draft is news"() {
         given:
             def token = "dssfffs"
             def articleRequest = new ArticleRequest()
-            articleRequest.setType("ARTICLE")
+            articleRequest.setType("NEWS")
             def draft = ArticleMapper.INSTANCE.requestToEntity(articleRequest)
             draft.setUserId(1)
             draft.setDraft(true)
@@ -37,6 +37,7 @@ class ArticleServiceImplTest extends Specification {
             draft.setApproved(false)
             draft.setApproverId(null)
             draft.setComments(Collections.emptyList())
+            draft.setTags(Collections.emptyList())
             def userAuthentication = new UserAuthentication("1", true)
             SecurityContextHolder.getContext().setAuthentication(userAuthentication)
 
@@ -44,11 +45,11 @@ class ArticleServiceImplTest extends Specification {
             articleService.addDraft(token, articleRequest)
 
         then:
-            1 * tagRepository.saveAll(draft.getTags())
             1 * articleRepository.save(draft)
 
 
     }
+
 
     def "should throw InvalidTokenException if token is invalid"() {
         given:

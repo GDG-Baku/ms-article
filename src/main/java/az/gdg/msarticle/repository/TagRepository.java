@@ -6,4 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface TagRepository extends MongoRepository<TagEntity, String> {
+
+    TagEntity findByName(String name);
 }
