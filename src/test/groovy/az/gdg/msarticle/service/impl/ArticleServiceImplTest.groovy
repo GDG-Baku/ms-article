@@ -1,7 +1,6 @@
 package az.gdg.msarticle.service.impl
 
 import az.gdg.msarticle.exception.ArticleNotFoundException
-import az.gdg.msarticle.exception.InvalidTokenException
 import az.gdg.msarticle.exception.NoAccessException
 import az.gdg.msarticle.exception.TypeNotFoundException
 import az.gdg.msarticle.model.ArticleRequest
@@ -74,26 +73,6 @@ class ArticleServiceImplTest extends Specification {
             articleService.updateArticle(articleId, articleRequest)
         then:
             thrown(NoAccessException)
-    }
-
-    def "should throw InvalidTokenException when user is not authenticated"() {
-        given:
-            def userAuthentication = null
-            SecurityContextHolder.getContext().setAuthentication(userAuthentication)
-        when:
-            articleService.getAuthenticatedObject()
-        then:
-            thrown(InvalidTokenException)
-    }
-
-    def "should return authenticated object"() {
-        given:
-            def userAuthentication = new UserAuthentication("1", true)
-            SecurityContextHolder.getContext().setAuthentication(userAuthentication)
-        when:
-            articleService.getAuthenticatedObject()
-        then:
-            notThrown(InvalidTokenException)
     }
 
     def "should return value of article or forum or news"() {

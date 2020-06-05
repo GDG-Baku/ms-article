@@ -1,7 +1,6 @@
 package az.gdg.msarticle.service.impl;
 
 import az.gdg.msarticle.exception.ArticleNotFoundException;
-import az.gdg.msarticle.exception.InvalidTokenException;
 import az.gdg.msarticle.exception.NoAccessException;
 import az.gdg.msarticle.exception.TypeNotFoundException;
 import az.gdg.msarticle.model.ArticleRequest;
@@ -11,12 +10,11 @@ import az.gdg.msarticle.repository.ArticleRepository;
 import az.gdg.msarticle.service.ArticleService;
 import az.gdg.msarticle.service.MailService;
 import az.gdg.msarticle.service.TagService;
+import az.gdg.msarticle.util.AuthUtil;
 import az.gdg.msarticle.util.MailUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -37,7 +35,7 @@ public class ArticleServiceImpl implements ArticleService {
     @Override
     public String updateArticle(String articleId, ArticleRequest articleRequest) {
         logger.info("ActionLog.updateArticle.start with id {}", articleId);
-        String userId = (String) getAuthenticatedObject().getPrincipal();
+        String userId = (String) AuthUtil.getAuthenticatedObject().getPrincipal();
 
         ArticleEntity articleEntity = articleRepository.findById(articleId).orElseThrow(() ->
                 new ArticleNotFoundException("Article doesn't exist with this id " + articleId));
@@ -73,12 +71,5 @@ public class ArticleServiceImpl implements ArticleService {
             }
         }
         throw new TypeNotFoundException("Please, specify valid type");
-    }
-
-    private Authentication getAuthenticatedObject() {
-        if (SecurityContextHolder.getContext().getAuthentication() == null) {
-            throw new InvalidTokenException("Token is not valid or it is expired");
-        }
-        return SecurityContextHolder.getContext().getAuthentication();
     }
 }
