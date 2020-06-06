@@ -34,7 +34,7 @@ public class MailUtil {
         logger.info("ActionLog.sendMail.start");
         String mailBody = "Author that has article with id " + articleId + " wants to " + requestType + " it.<br>" +
                 "Please review article before " + requestType;
-        mailService.sendToQueue(MailUtil.buildMail(mailBody));
+        mailService.sendToQueue(buildMail(mailBody));
         logger.info("ActionLog.sendMail.end");
     }
 }
