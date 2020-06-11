@@ -11,13 +11,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/health")
+@CrossOrigin(exposedHeaders = "Access-Control-Allow-Origin")
 public class HealthController {
 
     private static final Logger logger = LoggerFactory.getLogger(HealthController.class);
 
-
     @ApiOperation(value = "Method will be called by ms-alarm")
-    @CrossOrigin(exposedHeaders = "Access-Control-Allow-Origin")
     @GetMapping
     public void health() {
         logger.info("ActionLog.ms-article.start");
