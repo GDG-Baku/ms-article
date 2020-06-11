@@ -15,3 +15,8 @@ spring:
         output:
           destination: mail
           group: mail-group
+
+client:
+  service:
+    url:
+      ms-auth: https://gdg-ms-auth.herokuapp.com
