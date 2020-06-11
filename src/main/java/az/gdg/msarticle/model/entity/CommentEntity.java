@@ -20,7 +20,7 @@ public class CommentEntity {
     @Id
     private String id;
     private String text;
-    private Integer userId;
+    private Long userId;
     private boolean isReply;
 
     @DBRef
