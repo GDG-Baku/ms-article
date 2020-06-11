@@ -12,7 +12,7 @@ import java.util.List;
 @NoArgsConstructor
 public class CommentDTO {
     private String id;
-    private Integer userId;
+    private Long userId;
     private String text;
     private String firstName;
     private String lastName;
