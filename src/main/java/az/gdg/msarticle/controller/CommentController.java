@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/comments")
+@CrossOrigin(exposedHeaders = "Access-Control-Allow-Origin")
 public class CommentController {
     private static final Logger logger = LoggerFactory.getLogger(CommentController.class);
     private final CommentService commentService;
@@ -25,8 +26,7 @@ public class CommentController {
     }
 
     @ApiOperation(value = "Deleting comment by id")
-    @CrossOrigin(exposedHeaders = "Access-Control-Allow-Origin")
-    @DeleteMapping("{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteComment(@RequestHeader("X-Auth-Token") String token,
                                                 @PathVariable String id) {
         logger.debug("Delete comment with id {} start", id);
