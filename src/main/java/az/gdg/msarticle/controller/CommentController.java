@@ -29,7 +29,7 @@ public class CommentController {
     @DeleteMapping("{id}")
     public ResponseEntity<String> deleteComment(@RequestHeader("X-Auth-Token") String token,
                                                 @PathVariable String id) {
-        logger.debug("Delete comment method start");
+        logger.debug("Delete comment with id {} start", id);
         return new ResponseEntity<>(commentService.deleteComment(id), HttpStatus.OK);
     }
 }
