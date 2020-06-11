@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/articles")
+@CrossOrigin(exposedHeaders = "Access-Control-Allow-Origin")
 public class ArticleController {
     private static final Logger logger = LoggerFactory.getLogger(ArticleController.class);
     private final ArticleService articleService;
@@ -27,12 +28,11 @@ public class ArticleController {
     }
 
     @ApiOperation(value = "Update article method")
-    @CrossOrigin(exposedHeaders = "Access-Control-Allow-Origin")
-    @PutMapping("{articleId}")
+    @PutMapping("/{articleId}")
     public ResponseEntity<String> updateArticle(@RequestHeader("X-Auth-Token") String token,
                                                 @PathVariable String articleId,
                                                 @RequestBody ArticleRequest articleRequest) {
-        logger.debug("Update article start");
+        logger.debug("Update article with article id {} start", articleId);
         return new ResponseEntity<>(articleService.updateArticle(articleId, articleRequest), HttpStatus.OK);
     }
 }
