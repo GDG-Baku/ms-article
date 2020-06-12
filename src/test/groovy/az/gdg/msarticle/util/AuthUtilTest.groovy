@@ -27,6 +27,5 @@ class AuthUtilTest extends Specification {
             AuthUtil.getAuthenticatedObject()
         then:
             thrown(InvalidTokenException)
-
     }
 }

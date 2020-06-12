@@ -10,11 +10,11 @@ import spock.lang.Specification
 
 class CommentServiceImplTest extends Specification {
 
-    CommentRepository commentRepository
-    CommentServiceImpl commentService
+    private def commentRepository
+    private def commentService
 
     void setup() {
-        commentRepository = Mock()
+        commentRepository = Mock(CommentRepository)
         commentService = new CommentServiceImpl(commentRepository)
     }
 
@@ -52,7 +52,6 @@ class CommentServiceImplTest extends Specification {
             notThrown(exception)
         where:
             exception << [NoAccessException, CommentNotFoundException]
-
     }
 
     def "should throw NoAccessException when deleting comment"() {
