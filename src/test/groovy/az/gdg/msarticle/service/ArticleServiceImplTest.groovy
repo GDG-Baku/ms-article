@@ -11,9 +11,9 @@ import spock.lang.Title
 @Title("Tests for article service implementation")
 class ArticleServiceImplTest extends Specification {
 
-    ArticleRepository articleRepository
-    MsAuthClient msAuthClient
-    ArticleServiceImpl articleService
+    private ArticleRepository articleRepository
+    private MsAuthClient msAuthClient
+    private ArticleServiceImpl articleService
 
     def setup() {
         articleRepository = Mock()
