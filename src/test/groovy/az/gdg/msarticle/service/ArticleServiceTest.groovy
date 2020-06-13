@@ -41,7 +41,7 @@ class ArticleServiceTest extends Specification {
         then: "get article"
             1 * articleRepository.findById(articleId) >> Optional.of(articleEntity)
             1 * commentRepository.deleteAll(articleEntity.getComments())
-            1 * articleRepository.deleteById(articleEntity.id)
+            1 * articleRepository.deleteById(articleId)
     }
     
     def "should throw UnauthorizedAccessException if it's not own article"() {
