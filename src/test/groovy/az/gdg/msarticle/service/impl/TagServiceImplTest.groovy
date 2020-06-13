@@ -9,8 +9,8 @@ import spock.lang.Title
 @Title("Testing for tag service implementation")
 class TagServiceImplTest extends Specification {
 
-    TagRepository tagRepository
-    TagServiceImpl tagService
+    private TagRepository tagRepository
+    private TagServiceImpl tagService
 
 
     def setup() {
