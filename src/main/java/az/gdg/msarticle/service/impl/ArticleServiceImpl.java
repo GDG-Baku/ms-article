@@ -31,10 +31,10 @@ public class ArticleServiceImpl implements ArticleService {
     @Override
     public void addHateByArticleId(String articleID, String token) {
         logger.info("ActionLog.addHateByArticleId.start");
-        Integer userId = Integer.parseInt((String) getAuthenticatedObject().getPrincipal());
+        Long userId = Long.parseLong((String) getAuthenticatedObject().getPrincipal());
         ArticleEntity articleEntity = articleRepository.findById(articleID)
                 .orElseThrow(() -> new NoSuchArticleException("Article doesn't exist"));
-        Integer articleUserId = articleEntity.getUserId();
+        Long articleUserId = articleEntity.getUserId();
         Integer remainingQuackCount = msAuthService.getRemainingHateCount(token);
         if (!articleUserId.equals(userId) && getAuthenticatedObject().isAuthenticated()) {
             if (remainingQuackCount > 0) {
