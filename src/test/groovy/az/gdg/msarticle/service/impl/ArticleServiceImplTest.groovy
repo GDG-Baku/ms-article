@@ -11,10 +11,10 @@ import org.springframework.security.core.context.SecurityContextHolder
 import spock.lang.Specification
 
 class ArticleServiceImplTest extends Specification {
-    def articleRepository
-    def tagService
-    def mailService
-    def articleService
+    private def articleRepository
+    private def tagService
+    private def mailService
+    private def articleService
 
     void setup() {
         articleRepository = Mock(ArticleRepository)

@@ -8,8 +8,8 @@ import spock.lang.Specification
 
 class TagServiceImplTest extends Specification {
 
-    def tagRepository
-    def tagService
+    private def tagRepository
+    private def tagService
 
     void setup() {
         tagRepository = Mock(TagRepository)
