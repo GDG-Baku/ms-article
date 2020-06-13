@@ -19,9 +19,9 @@ import spock.lang.Title
 @Title("Testing for comment service implementation")
 class CommentServiceImplTest extends Specification {
 
-    ArticleRepository articleRepository
-    CommentRepository commentRepository
-    CommentServiceImpl commentService
+    private ArticleRepository articleRepository
+    private CommentRepository commentRepository
+    private CommentServiceImpl commentService
 
     def setup() {
         articleRepository = Mock()
