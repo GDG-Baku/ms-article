@@ -40,7 +40,7 @@ public class ArticleServiceImpl implements ArticleService {
         String userId = (String) getAuthenticatedObject().getPrincipal();
 
         ArticleEntity draft = ArticleMapper.INSTANCE.requestToEntity(articleRequest);
-        draft.setUserId(Integer.parseInt(userId));
+        draft.setUserId(Long.parseLong(userId));
         draft.setDraft(true);
         draft.setReadCount(0);
         draft.setHateCount(0);
