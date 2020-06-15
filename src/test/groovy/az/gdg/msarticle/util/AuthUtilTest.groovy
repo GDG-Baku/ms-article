@@ -9,9 +9,9 @@ class AuthUtilTest extends Specification {
     void setup() {
     }
 
-    def "should get authenticated object"() {
+    def "should return authenticated object"() {
         given:
-            def userAuthentication = new UserAuthentication("", true)
+            def userAuthentication = new UserAuthentication("1", true)
             SecurityContextHolder.getContext().setAuthentication(userAuthentication)
         when:
             AuthUtil.getAuthenticatedObject()
@@ -19,7 +19,7 @@ class AuthUtilTest extends Specification {
             notThrown(InvalidTokenException)
     }
 
-    def "should throw InvalidTokenException when user is not authenticate"() {
+    def "should throw InvalidTokenException when user is not authenticated"() {
         given:
             def userAuthentication = null
             SecurityContextHolder.getContext().setAuthentication(userAuthentication)
