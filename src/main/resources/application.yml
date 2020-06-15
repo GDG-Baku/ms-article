@@ -19,4 +19,4 @@ spring:
 client:
   service:
     url:
-      ms-auth: https://gdg-ms-auth.herokuapp.com
+      ms-auth: ${SERVICE_URL_MS-AUTH}
