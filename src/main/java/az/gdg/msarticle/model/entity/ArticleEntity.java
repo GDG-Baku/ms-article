@@ -23,7 +23,7 @@ public class ArticleEntity {
     @Id
     private String id;
     private Integer type;
-    private Integer userId;
+    private Long userId;
     private String title;
     private String content;
     @CreatedDate
