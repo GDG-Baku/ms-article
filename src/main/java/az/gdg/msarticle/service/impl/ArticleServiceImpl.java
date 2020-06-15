@@ -28,7 +28,7 @@ public class ArticleServiceImpl implements ArticleService {
         ArticleEntity articleEntity = articleRepository.findById(articleId)
                 .orElseThrow(() -> new ArticleNotFoundException("Not found such article"));
 
-        Integer userId = articleEntity.getUserId();
+        Long userId = articleEntity.getUserId();
         Integer count = articleEntity.getReadCount();
         articleEntity.setReadCount(count + 1);
 
