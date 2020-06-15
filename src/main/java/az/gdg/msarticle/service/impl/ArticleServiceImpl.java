@@ -1,7 +1,7 @@
 package az.gdg.msarticle.service.impl;
 
+import az.gdg.msarticle.exception.InvalidTokenException;
 import az.gdg.msarticle.exception.NoSuchArticleException;
-import az.gdg.msarticle.exception.NotValidTokenException;
 import az.gdg.msarticle.exception.UnauthorizedAccessException;
 import az.gdg.msarticle.mapper.ArticleMapper;
 import az.gdg.msarticle.mapper.CommentMapper;
@@ -46,7 +46,7 @@ public class ArticleServiceImpl implements ArticleService {
                     logger.error("Thrown.UnauthorizedAccessException");
                     throw new UnauthorizedAccessException("You don't have permission to get the article");
                 }
-            } catch (NotValidTokenException e) {
+            } catch (InvalidTokenException e) {
                 logger.error("Thrown.UnauthorizedAccessException");
                 throw new UnauthorizedAccessException("You don't have permission to get the article");
             }
@@ -62,8 +62,8 @@ public class ArticleServiceImpl implements ArticleService {
 
     private Authentication getAuthenticatedObject() {
         if (SecurityContextHolder.getContext().getAuthentication() == null) {
-            logger.info("Thrown.NotValidTokenException");
-            throw new NotValidTokenException("Token is not valid or it is expired");
+            logger.info("Thrown.InvalidTokenException");
+            throw new InvalidTokenException("Token is not valid or it is expired");
         }
         return SecurityContextHolder.getContext().getAuthentication();
     }
