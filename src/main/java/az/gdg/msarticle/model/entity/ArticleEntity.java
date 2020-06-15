@@ -21,7 +21,7 @@ import java.util.List;
 public class ArticleEntity {
     @Id
     private String id;
-    private Integer userId;
+    private Long userId;
     private String title;
     private String content;
     private Integer type;

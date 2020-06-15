@@ -50,7 +50,7 @@ public class CommentServiceImpl implements CommentService {
 
         String userId = (String) getAuthenticatedObject().getPrincipal();
         CommentEntity commentEntity = CommentMapper.INSTANCE.requestToEntity(commentRequest);
-        commentEntity.setUserId(Integer.parseInt(userId));
+        commentEntity.setUserId(Long.parseLong(userId));
 
         if (!commentRequest.getParentCommentId().isEmpty()) {
             commentEntity.setReply(true);
