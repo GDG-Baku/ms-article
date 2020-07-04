@@ -9,6 +9,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class TagDTO {
-    private String name;
+public class UserDTO {
+    String firstName;
+    String lastName;
+    String imageUrl;
 }

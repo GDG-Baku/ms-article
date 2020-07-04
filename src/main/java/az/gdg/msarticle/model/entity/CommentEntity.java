@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import lombok.Builder;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
@@ -22,10 +23,8 @@ public class CommentEntity {
     private String text;
     private Long userId;
     private boolean isReply;
-
     @DBRef
     private List<CommentEntity> replies;
-
     @CreatedDate
     private LocalDateTime createdAt;
 }

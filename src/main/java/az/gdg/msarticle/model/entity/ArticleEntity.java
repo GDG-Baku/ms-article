@@ -1,6 +1,7 @@
 package az.gdg.msarticle.model.entity;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -15,6 +16,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 
 @Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Document(collection = "articles")
@@ -24,6 +26,7 @@ public class ArticleEntity {
     private Long userId;
     private String title;
     private String content;
+    private String type;
 
     @CreatedDate
     private LocalDateTime createdAt;
