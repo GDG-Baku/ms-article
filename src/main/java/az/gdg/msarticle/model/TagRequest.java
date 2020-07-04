@@ -7,8 +7,6 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CommentRequest {
-    private String articleId;
-    private String text;
-    private String parentCommentId;
+public class TagRequest {
+    private String name;
 }

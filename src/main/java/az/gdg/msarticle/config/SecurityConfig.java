@@ -1,6 +1,7 @@
 package az.gdg.msarticle.config;
 
 import az.gdg.msarticle.filter.AuthenticationTokenFilter;
+
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -48,7 +49,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .requestMatchers()
-                .antMatchers("/api/members/internal/**")
+                .antMatchers("/api/**")
                 .and()
                 .addFilterBefore(authenticationTokenFilter, FilterSecurityInterceptor.class);
     }

@@ -14,7 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 public class CommentDTO {
     private String id;
-    private Integer userId;
+    private Long userId;
     private UserDTO userDTO;
     private String text;
     private LocalDateTime createdAt;

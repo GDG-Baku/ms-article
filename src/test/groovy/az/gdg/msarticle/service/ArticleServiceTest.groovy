@@ -40,7 +40,7 @@ class ArticleServiceTest extends Specification {
                     content: "Code Block", createdAt: LocalDateTime.now(), updatedAt: LocalDateTime.now(), quackCount: 30,
                     hateCount: 5, readCount: 75, isDraft: false, isApproved: true, approverId: 41, tags: [tag], comments: [comment])
             def userDTO = new UserDTO(firstName: "Ali", lastName: "Huseynov", imageUrl: "ali.png")
-            def userAuthentication = new UserAuthentication("1", true, "ADMIN")
+            def userAuthentication = new UserAuthentication("1", true)
             SecurityContextHolder.getContext().setAuthentication(userAuthentication)
             def articleDTO = ArticleMapper.INSTANCE.entityToDto(articleEntity, userDTO)
         
@@ -93,7 +93,7 @@ class ArticleServiceTest extends Specification {
             def articleEntity = new ArticleEntity(id: "5eac708be7179a42f172de4c", type: new Integer(2), userId: 41, title: "Test Title",
                     content: "Code Block", createdAt: LocalDateTime.now(), updatedAt: LocalDateTime.now(), quackCount: 30,
                     hateCount: 5, readCount: 75, isDraft: true, isApproved: false, approverId: 41, tags: [tag], comments: [comment])
-            def userAuthentication = new UserAuthentication("15", true, "USER")
+            def userAuthentication = new UserAuthentication("15", true)
             SecurityContextHolder.getContext().setAuthentication(userAuthentication)
         
         when:

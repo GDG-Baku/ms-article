@@ -5,10 +5,10 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-@FeignClient(value = "ms-auth", url = "${service.ms-auth.url}")
+@FeignClient(value = "ms-auth", url = "${client.service.url.ms-auth}")
 public interface MsAuthService {
     @GetMapping("/user/{userId}")
     UserDTO getUserById(
-            @PathVariable("userId") Integer userId
+            @PathVariable("userId") Long userId
     );
 }

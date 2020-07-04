@@ -39,7 +39,7 @@ public class ArticleServiceImpl implements ArticleService {
         logger.info("ActionLog.getArticleById.start with id {}", articleId);
         ArticleEntity articleEntity = articleRepository.findById(articleId)
                 .orElseThrow(() -> new NoSuchArticleException("Article doesn't exist"));
-        Integer userId = articleEntity.getUserId();
+        Long userId = articleEntity.getUserId();
         if (articleEntity.isDraft()) {
             try {
                 if (Integer.parseInt(getAuthenticatedObject().getPrincipal().toString()) != userId) {
