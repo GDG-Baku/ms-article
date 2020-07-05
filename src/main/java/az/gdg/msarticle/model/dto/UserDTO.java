@@ -1,4 +1,4 @@
-package az.gdg.msarticle.model.client.auth;
+package az.gdg.msarticle.model.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -6,10 +6,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
-public class UserInfo {
-    private String mail;
-    private String userId;
+public class UserDTO {
+    String firstName;
+    String lastName;
+    String imageUrl;
 }

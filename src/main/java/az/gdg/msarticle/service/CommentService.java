@@ -6,4 +6,5 @@ public interface CommentService {
 
     void postComment(String token, CommentRequest commentRequest);
 
+    String deleteComment(String id);
 }
