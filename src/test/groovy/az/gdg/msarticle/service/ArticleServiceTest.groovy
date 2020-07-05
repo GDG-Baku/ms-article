@@ -3,7 +3,7 @@ package az.gdg.msarticle.service
 import az.gdg.msarticle.exception.NoSuchArticleException
 import az.gdg.msarticle.exception.UnauthorizedAccessException
 import az.gdg.msarticle.mapper.ArticleMapper
-import az.gdg.msarticle.mapper.CommentMapper
+import az.gdg.msarticle.mapper.custom.CustomCommentMapper
 import az.gdg.msarticle.model.dto.UserDTO
 import az.gdg.msarticle.model.entity.ArticleEntity
 import az.gdg.msarticle.model.entity.CommentEntity
@@ -22,7 +22,7 @@ class ArticleServiceTest extends Specification {
     ArticleRepository articleRepository
     ArticleServiceImpl articleServiceImpl
     MsAuthService msAuthService
-    CommentMapper commentMapper
+    CustomCommentMapper commentMapper
     
     def setup() {
         articleRepository = Mock()

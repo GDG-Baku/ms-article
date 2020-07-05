@@ -3,6 +3,7 @@ package az.gdg.msarticle.service.impl;
 import az.gdg.msarticle.exception.ArticleNotFoundException;
 import az.gdg.msarticle.exception.CommentNotFoundException;
 import az.gdg.msarticle.exception.InvalidTokenException;
+import az.gdg.msarticle.exception.NoAccessException;
 import az.gdg.msarticle.exception.NotAllowedException;
 import az.gdg.msarticle.mapper.CommentMapper;
 import az.gdg.msarticle.model.CommentRequest;
@@ -11,6 +12,7 @@ import az.gdg.msarticle.model.entity.CommentEntity;
 import az.gdg.msarticle.repository.ArticleRepository;
 import az.gdg.msarticle.repository.CommentRepository;
 import az.gdg.msarticle.service.CommentService;
+import az.gdg.msarticle.util.AuthUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
@@ -25,6 +27,7 @@ public class CommentServiceImpl implements CommentService {
     private static final Logger logger = LoggerFactory.getLogger(CommentServiceImpl.class);
     private final ArticleRepository articleRepository;
     private final CommentRepository commentRepository;
+    private static final String NO_ACCESS_TO_REQUEST = "You don't have access for this request";
 
     public CommentServiceImpl(CommentRepository commentRepository,
                               ArticleRepository articleRepository) {
@@ -79,26 +82,8 @@ public class CommentServiceImpl implements CommentService {
 
         logger.info("ActionLog.postComment.stop.success : articleId {}", commentRequest.getArticleId());
 
-import az.gdg.msarticle.exception.CommentNotFoundException;
-import az.gdg.msarticle.exception.NoAccessException;
-import az.gdg.msarticle.model.entity.CommentEntity;
-import az.gdg.msarticle.repository.CommentRepository;
-import az.gdg.msarticle.service.CommentService;
-import az.gdg.msarticle.util.AuthUtil;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-
-@Service
-public class CommentServiceImpl implements CommentService {
-    private static final Logger logger = LoggerFactory.getLogger(CommentServiceImpl.class);
-    private final CommentRepository commentRepository;
-    private static final String NO_ACCESS_TO_REQUEST = "You don't have access for this request";
-
-    public CommentServiceImpl(CommentRepository commentRepository) {
-        this.commentRepository = commentRepository;
     }
+
 
     @Override
     public String deleteComment(String id) {

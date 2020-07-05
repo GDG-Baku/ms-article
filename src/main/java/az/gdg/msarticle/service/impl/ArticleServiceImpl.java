@@ -4,7 +4,7 @@ import az.gdg.msarticle.exception.InvalidTokenException;
 import az.gdg.msarticle.exception.NoSuchArticleException;
 import az.gdg.msarticle.exception.UnauthorizedAccessException;
 import az.gdg.msarticle.mapper.ArticleMapper;
-import az.gdg.msarticle.mapper.CommentMapper;
+import az.gdg.msarticle.mapper.custom.CustomCommentMapper;
 import az.gdg.msarticle.model.dto.ArticleDTO;
 import az.gdg.msarticle.model.dto.UserDTO;
 import az.gdg.msarticle.model.entity.ArticleEntity;
@@ -23,14 +23,14 @@ public class ArticleServiceImpl implements ArticleService {
     private static final Logger logger = LoggerFactory.getLogger(ArticleServiceImpl.class);
     private final ArticleRepository articleRepository;
     private final MsAuthService msAuthService;
-    private final CommentMapper commentMapper;
+    private final CustomCommentMapper customCommentMapper;
 
 
     public ArticleServiceImpl(ArticleRepository articleRepository, MsAuthService msAuthService,
-                              CommentMapper commentMapper) {
+                              CustomCommentMapper customCommentMapper) {
         this.articleRepository = articleRepository;
         this.msAuthService = msAuthService;
-        this.commentMapper = commentMapper;
+        this.customCommentMapper = customCommentMapper;
     }
 
 
@@ -53,7 +53,7 @@ public class ArticleServiceImpl implements ArticleService {
         }
         UserDTO userDTO = msAuthService.getUserById(userId);
         ArticleDTO articleDTO = ArticleMapper.INSTANCE.entityToDto(articleEntity, userDTO);
-        articleDTO.setComments(commentMapper.mapEntityListToDtoList(articleEntity.getComments()));
+        articleDTO.setComments(customCommentMapper.mapEntityListToDtoList(articleEntity.getComments()));
 
         logger.info("ActionLog.getArticleById.end with id {}", articleId);
         return articleDTO;
