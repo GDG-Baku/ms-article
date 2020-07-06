@@ -7,18 +7,17 @@ import java.util.Collection;
 
 public class UserAuthentication implements Authentication {
 
-    private String customerId;
+    private String userId;
     private boolean authenticated;
-    private String role;
 
-    public UserAuthentication(String customerId, boolean authenticated, String role) {
-        this.customerId = customerId;
+
+    public UserAuthentication(String userId, boolean authenticated) {
+        this.userId = userId;
         this.authenticated = authenticated;
-        this.role = role;
     }
 
-    public String getRole() {
-        return role;
+    public String getUserId() {
+        return userId;
     }
 
     @Override
@@ -38,14 +37,13 @@ public class UserAuthentication implements Authentication {
 
     @Override
     public String getPrincipal() {
-        return customerId;
+        return getUserId();
     }
 
     @Override
     public boolean isAuthenticated() {
         return authenticated;
     }
-
 
     @Override
     public void setAuthenticated(boolean authenticated) {

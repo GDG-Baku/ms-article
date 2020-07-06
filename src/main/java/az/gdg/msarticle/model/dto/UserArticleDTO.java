@@ -12,8 +12,6 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserArticleDTO {
-    private String firstName;
-    private String lastName;
-    private String imageUrl;
+    private UserDTO userDTO;
     private List<ArticleDTO> articleDTOs;
 }

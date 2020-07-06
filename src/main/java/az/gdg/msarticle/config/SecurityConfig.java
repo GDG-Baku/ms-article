@@ -48,7 +48,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .requestMatchers()
-                .antMatchers("/api/members/internal/**")
+                .antMatchers("/api/**")
                 .and()
                 .addFilterBefore(authenticationTokenFilter, FilterSecurityInterceptor.class);
     }

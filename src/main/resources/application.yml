@@ -1,8 +1,22 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+
 spring:
   data:
     mongodb:
       uri: ${MONGODB_URI}
-service:
-  ms-auth:
-    url: http://gdg-ms-auth.herokuapp.com
+  rabbitmq:
+    addresses: xxx
+  cloud:
+    stream:
+      bindings:
+        output:
+          destination: mail
+          group: mail-group
 
+client:
+  service:
+    url:
+      ms-auth: https://gdg-ms-auth.herokuapp.com

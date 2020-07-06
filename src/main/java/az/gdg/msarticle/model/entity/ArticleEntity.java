@@ -18,17 +18,21 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Document(collection = "article")
+@Document(collection = "articles")
 public class ArticleEntity {
     @Id
     private String id;
-    private Integer userId;
+    private Long userId;
     private String title;
     private String content;
+    private String type;
+
     @CreatedDate
     private LocalDateTime createdAt;
+
     @LastModifiedDate
     private LocalDateTime updatedAt;
+
     private Integer quackCount;
     private Integer hateCount;
     private Integer readCount;
