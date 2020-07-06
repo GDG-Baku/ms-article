@@ -1,6 +1,6 @@
 package az.gdg.msarticle.service.impl;
 
-import az.gdg.msarticle.exception.ArticleNotFoundException;
+import az.gdg.msarticle.exception.NoSuchArticleException;
 import az.gdg.msarticle.exception.NoAccessException;
 import az.gdg.msarticle.exception.NoDraftedArticleExist;
 import az.gdg.msarticle.model.entity.ArticleEntity;
@@ -33,7 +33,7 @@ public class ArticleServiceImpl implements ArticleService {
         String userId = (String) AuthUtil.getAuthenticatedObject().getPrincipal();
         String message;
         ArticleEntity articleEntity = articleRepository.findById(articleId)
-                .orElseThrow(() -> new ArticleNotFoundException("Article doesn't exist with this id" + articleId));
+                .orElseThrow(() -> new NoSuchArticleException("Article doesn't exist with this id" + articleId));
 
         if (String.valueOf(articleEntity.getUserId()).equals(userId)) {
             if (articleEntity.isDraft()) {
