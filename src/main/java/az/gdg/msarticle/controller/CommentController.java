@@ -2,7 +2,6 @@ package az.gdg.msarticle.controller;
 
 import az.gdg.msarticle.service.CommentService;
 import io.swagger.annotations.ApiOperation;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;

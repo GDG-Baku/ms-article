@@ -8,7 +8,7 @@ import spock.lang.Specification
 class AuthUtilTest extends Specification {
     void setup() {
     }
-
+    
     def "should return authenticated object"() {
         given:
             def userAuthentication = new UserAuthentication("1", true)
@@ -18,7 +18,7 @@ class AuthUtilTest extends Specification {
         then:
             notThrown(InvalidTokenException)
     }
-
+    
     def "should throw InvalidTokenException when user is not authenticated"() {
         given:
             def userAuthentication = null

@@ -6,7 +6,6 @@ import az.gdg.msarticle.model.entity.CommentEntity;
 import az.gdg.msarticle.repository.CommentRepository;
 import az.gdg.msarticle.service.CommentService;
 import az.gdg.msarticle.util.AuthUtil;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -14,8 +13,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class CommentServiceImpl implements CommentService {
     private static final Logger logger = LoggerFactory.getLogger(CommentServiceImpl.class);
-    private final CommentRepository commentRepository;
     private static final String NO_ACCESS_TO_REQUEST = "You don't have access for this request";
+    private final CommentRepository commentRepository;
 
     public CommentServiceImpl(CommentRepository commentRepository) {
         this.commentRepository = commentRepository;

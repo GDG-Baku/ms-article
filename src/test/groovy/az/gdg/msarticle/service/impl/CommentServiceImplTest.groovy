@@ -9,15 +9,15 @@ import org.springframework.security.core.context.SecurityContextHolder
 import spock.lang.Specification
 
 class CommentServiceImplTest extends Specification {
-
+    
     private def commentRepository
     private def commentService
-
+    
     void setup() {
         commentRepository = Mock(CommentRepository)
         commentService = new CommentServiceImpl(commentRepository)
     }
-
+    
     def "should delete child comment"() {
         given:
             def commentId = "1"
@@ -34,7 +34,7 @@ class CommentServiceImplTest extends Specification {
         where:
             exception << [NoAccessException, CommentNotFoundException]
     }
-
+    
     def "should delete parent comment"() {
         given:
             def commentId = "1"
@@ -53,7 +53,7 @@ class CommentServiceImplTest extends Specification {
         where:
             exception << [NoAccessException, CommentNotFoundException]
     }
-
+    
     def "should throw NoAccessException when deleting comment"() {
         given:
             def commentId = "1"
@@ -67,7 +67,7 @@ class CommentServiceImplTest extends Specification {
         then:
             thrown(NoAccessException)
     }
-
+    
     def "should throw CommentNotFound when deleting comment"() {
         given:
             def commentId = "1"

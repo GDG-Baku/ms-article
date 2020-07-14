@@ -1,11 +1,11 @@
 package az.gdg.msarticle.security;
 
-import java.util.Collection;
-
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 
-public class UserAuthentication  implements Authentication {
+import java.util.Collection;
+
+public class UserAuthentication implements Authentication {
 
     private String userId;
     private boolean authenticated;
