@@ -5,6 +5,11 @@ import az.gdg.msarticle.model.entity.CommentEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
 import org.mapstruct.factory.Mappers;
+import org.mapstruct.Mapper;
+import org.mapstruct.ReportingPolicy;
+import org.mapstruct.factory.Mappers;
+
+import java.util.List;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface CommentMapper {
@@ -12,4 +17,8 @@ public interface CommentMapper {
     CommentMapper INSTANCE = Mappers.getMapper(CommentMapper.class);
 
     CommentEntity requestToEntity(CommentRequest commentRequest);
+}
+    List<CommentDTO> entityToDtoList(List<CommentEntity> commentEntity);
+
+    CommentDTO entityToDto(CommentEntity commentEntity, UserDTO userDTO);
 }

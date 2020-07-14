@@ -6,4 +6,6 @@ public interface ArticleService {
 
     ArticleDTO getArticleById(String articleId);
 
+    void deleteArticleById(String articleId);
+
 }

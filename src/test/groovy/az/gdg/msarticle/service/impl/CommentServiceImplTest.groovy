@@ -19,6 +19,7 @@ class CommentServiceImplTest extends Specification {
 
     private def commentRepository
     private def commentService
+
     private def articleRepository
 
     void setup() {

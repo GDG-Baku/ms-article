@@ -1,7 +1,6 @@
 package az.gdg.msarticle.util;
 
 import az.gdg.msarticle.exception.InvalidTokenException;
-
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
