@@ -28,7 +28,6 @@ public class CommentServiceImpl implements CommentService {
     private final ArticleRepository articleRepository;
     private final CommentRepository commentRepository;
     private static final String NO_ACCESS_TO_REQUEST = "You don't have access for this request";
-    private final CommentRepository commentRepository;
 
     public CommentServiceImpl(CommentRepository commentRepository,
                               ArticleRepository articleRepository) {
