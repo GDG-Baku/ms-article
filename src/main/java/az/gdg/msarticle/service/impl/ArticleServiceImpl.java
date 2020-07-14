@@ -4,7 +4,7 @@ import az.gdg.msarticle.exception.InvalidTokenException;
 import az.gdg.msarticle.exception.NoSuchArticleException;
 import az.gdg.msarticle.exception.UnauthorizedAccessException;
 import az.gdg.msarticle.mapper.ArticleMapper;
-import az.gdg.msarticle.mapper.custom.CustomCommentMapper;
+import az.gdg.msarticle.mapper.CommentMapper;
 import az.gdg.msarticle.model.dto.ArticleDTO;
 import az.gdg.msarticle.model.dto.CommentDTO;
 import az.gdg.msarticle.model.dto.UserDTO;
@@ -28,16 +28,13 @@ public class ArticleServiceImpl implements ArticleService {
     private final ArticleRepository articleRepository;
     private final MsAuthService msAuthService;
     private final CommentRepository commentRepository;
-    private final CustomCommentMapper customCommentMapper;
 
 
     public ArticleServiceImpl(ArticleRepository articleRepository, MsAuthService msAuthService,
                               CommentRepository commentRepository) {
-                              CustomCommentMapper customCommentMapper) {
         this.articleRepository = articleRepository;
         this.msAuthService = msAuthService;
         this.commentRepository = commentRepository;
-        this.customCommentMapper = customCommentMapper;
     }
 
 
@@ -85,7 +82,7 @@ public class ArticleServiceImpl implements ArticleService {
         UserDTO userDTO = msAuthService.getUserById(userId);
         ArticleDTO articleDTO = ArticleMapper.INSTANCE.entityToDto(articleEntity, userDTO);
         articleDTO.setComments(getCommentDTOsWithUserDTO(articleEntity.getComments()));
-        articleDTO.setComments(customCommentMapper.mapEntityListToDtoList(articleEntity.getComments()));
+        articleDTO.setComments(CommentMapper.INSTANCE.entityToDtoList(articleEntity.getComments()));
 
         logger.info("ActionLog.getArticleById.end with id {}", articleId);
         return articleDTO;
