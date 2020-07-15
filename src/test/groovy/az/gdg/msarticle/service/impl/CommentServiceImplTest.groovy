@@ -2,8 +2,8 @@ package az.gdg.msarticle.service.impl
 
 import az.gdg.msarticle.exception.ArticleNotFoundException
 import az.gdg.msarticle.exception.CommentNotFoundException
-import az.gdg.msarticle.exception.NoAccessException
 import az.gdg.msarticle.exception.NotAllowedException
+import az.gdg.msarticle.exception.UnauthorizedAccessException
 import az.gdg.msarticle.mapper.CommentMapper
 import az.gdg.msarticle.model.CommentRequest
 import az.gdg.msarticle.model.entity.ArticleEntity
@@ -41,7 +41,7 @@ class CommentServiceImplTest extends Specification {
             1 * commentRepository.deleteById(commentId)
             notThrown(exception)
         where:
-            exception << [NoAccessException, CommentNotFoundException]
+            exception << [UnauthorizedAccessException, CommentNotFoundException]
     }
 
     def "should delete parent comment"() {
@@ -60,10 +60,10 @@ class CommentServiceImplTest extends Specification {
             1 * commentRepository.deleteById(commentId)
             notThrown(exception)
         where:
-            exception << [NoAccessException, CommentNotFoundException]
+            exception << [UnauthorizedAccessException, CommentNotFoundException]
     }
 
-    def "should throw NoAccessException when deleting comment"() {
+    def "should throw UnauthorizedAccessException when deleting comment"() {
         given:
             def commentId = "1"
             def userAuthentication = new UserAuthentication("2", true)
@@ -74,7 +74,7 @@ class CommentServiceImplTest extends Specification {
         when:
             commentService.deleteComment(commentId)
         then:
-            thrown(NoAccessException)
+            thrown(UnauthorizedAccessException)
     }
 
     def "should throw CommentNotFound when deleting comment"() {

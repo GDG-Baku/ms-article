@@ -1,6 +1,9 @@
 package az.gdg.msarticle.service.impl
 
-import az.gdg.msarticle.exception.*
+import az.gdg.msarticle.exception.ArticleNotFoundException
+import az.gdg.msarticle.exception.NoDraftedArticleExist
+import az.gdg.msarticle.exception.NoSuchArticleException
+import az.gdg.msarticle.exception.UnauthorizedAccessException
 import az.gdg.msarticle.mapper.ArticleMapper
 import az.gdg.msarticle.model.dto.CommentDTO
 import az.gdg.msarticle.model.dto.UserDTO
@@ -48,10 +51,10 @@ class ArticleServiceImplTest extends Specification {
             1 * mailService.sendToQueue(_)
             notThrown(exception)
         where:
-            exception << [NoSuchArticleException, NoAccessException, NoDraftedArticleExist]
+            exception << [NoSuchArticleException, UnauthorizedAccessException, NoDraftedArticleExist]
     }
 
-    def "should throw NoAccessException when not authorized user tries to publish"() {
+    def "should throw UnauthorizedAccessException when not authorized user tries to publish"() {
         given:
             def articleId = "1"
             def articleEntity = new ArticleEntity()
@@ -63,7 +66,7 @@ class ArticleServiceImplTest extends Specification {
         when:
             articleServiceImpl.publishArticle(articleId)
         then:
-            thrown(NoAccessException)
+            thrown(UnauthorizedAccessException)
     }
 
     def "should throw ArticleNotFoundException when article doesn't exist"() {

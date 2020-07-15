@@ -2,7 +2,6 @@ package az.gdg.msarticle.service.impl;
 
 import az.gdg.msarticle.exception.ArticleNotFoundException;
 import az.gdg.msarticle.exception.InvalidTokenException;
-import az.gdg.msarticle.exception.NoAccessException;
 import az.gdg.msarticle.exception.NoDraftedArticleExist;
 import az.gdg.msarticle.exception.NoSuchArticleException;
 import az.gdg.msarticle.exception.UnauthorizedAccessException;
@@ -21,11 +20,11 @@ import az.gdg.msarticle.service.MsAuthService;
 import az.gdg.msarticle.util.AuthUtil;
 import az.gdg.msarticle.util.MailUtil;
 
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class ArticleServiceImpl implements ArticleService {
@@ -34,8 +33,6 @@ public class ArticleServiceImpl implements ArticleService {
     private final MsAuthService msAuthService;
     private final CommentRepository commentRepository;
     private final MailService mailService;
-    private static final String NO_ACCESS_TO_REQUEST = "You don't have access for this request";
-
 
     public ArticleServiceImpl(ArticleRepository articleRepository,
                               MsAuthService msAuthService,
@@ -142,6 +139,6 @@ public class ArticleServiceImpl implements ArticleService {
             return message;
         }
         logger.info("ServiceLog.publishArticle.end");
-        throw new NoAccessException(NO_ACCESS_TO_REQUEST);
+        throw new UnauthorizedAccessException("You don't have permission to publish this article");
     }
 }
