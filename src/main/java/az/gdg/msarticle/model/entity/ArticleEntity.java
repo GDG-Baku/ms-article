@@ -24,6 +24,7 @@ public class ArticleEntity {
     private Long userId;
     private String title;
     private String content;
+    private Integer type;
     @CreatedDate
     private LocalDateTime createdAt;
     @LastModifiedDate

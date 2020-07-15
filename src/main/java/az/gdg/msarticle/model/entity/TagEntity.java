@@ -8,12 +8,13 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Document(collection = "tags")
 public class TagEntity {
     @Id
     private String id;
     private String name;
+
 }

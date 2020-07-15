@@ -1,5 +1,8 @@
 server:
   port: 8080
+  servlet:
+    context-path: /api
+
 logging:
   level:
     org:
@@ -13,8 +16,18 @@ spring:
 swagger:
   enabled: true
 
-service:
-  url:
-    ms-auth: ${SERVICE_URL_MS-AUTH}
+client:
+  service:
+    url:
+      ms-auth: ${SERVICE_URL_MS-AUTH}
 
+
+  rabbitmq:
+    addresses: xxx
+  cloud:
+    stream:
+      bindings:
+        output:
+          destination: mail
+          group: mail-group
 
