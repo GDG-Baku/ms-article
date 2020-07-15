@@ -47,7 +47,7 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     public void addReadCount(String articleId) {
-        logger.info("ActionLog.addReadCount.start.articleId : {}", articleId);
+        logger.info("ServiceLog.addReadCount.start.articleId : {}", articleId);
         ArticleEntity articleEntity = articleRepository.findById(articleId)
                 .orElseThrow(() -> new ArticleNotFoundException("Not found such article"));
 
@@ -58,11 +58,11 @@ public class ArticleServiceImpl implements ArticleService {
         msAuthService.addPopularity(userId);
         articleRepository.save(articleEntity);
 
-        logger.info("ActionLog.addReadCount.stop.success");
+        logger.info("ServiceLog.addReadCount.stop.success");
     }
 
     public void deleteArticleById(String articleID) {
-        logger.info("ActionLog.deleteArticleById.start");
+        logger.info("ServiceLog.deleteArticleById.start");
         Long userId = Long.parseLong((String) AuthUtil.getAuthenticatedObject().getPrincipal());
         ArticleEntity articleEntity = articleRepository.findById(articleID)
                 .orElseThrow(() -> new NoSuchArticleException("Article doesn't exist"));
@@ -86,7 +86,7 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     public ArticleDTO getArticleById(String articleId) {
-        logger.info("ActionLog.getArticleById.start with id {}", articleId);
+        logger.info("ServiceLog.getArticleById.start with id {}", articleId);
         ArticleEntity articleEntity = articleRepository.findById(articleId)
                 .orElseThrow(() -> new NoSuchArticleException("Article doesn't exist"));
         Long userId = articleEntity.getUserId();
@@ -106,7 +106,7 @@ public class ArticleServiceImpl implements ArticleService {
         articleDTO.setComments(getCommentDTOsWithUserDTO(articleEntity.getComments()));
         articleDTO.setComments(CommentMapper.INSTANCE.entityToDtoList(articleEntity.getComments()));
 
-        logger.info("ActionLog.getArticleById.end with id {}", articleId);
+        logger.info("ServiceLog.getArticleById.end with id {}", articleId);
         return articleDTO;
     }
 

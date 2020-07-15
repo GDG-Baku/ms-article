@@ -34,7 +34,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public void postComment(String token, CommentRequest commentRequest) {
-        logger.info("ActionLog.postComment.start : articleId {}", commentRequest.getArticleId());
+        logger.info("ServiceLog.postComment.start : articleId {}", commentRequest.getArticleId());
 
         ArticleEntity article = articleRepository.findById(commentRequest.getArticleId()).orElseThrow(
                 () -> new ArticleNotFoundException("Not found such article!"));
@@ -63,7 +63,7 @@ public class CommentServiceImpl implements CommentService {
             article.getComments().add(commentEntity);
             articleRepository.save(article);
         }
-        logger.info("ActionLog.postComment.stop.success : articleId {}", commentRequest.getArticleId());
+        logger.info("ServiceLog.postComment.stop.success : articleId {}", commentRequest.getArticleId());
     }
 
     @Override
