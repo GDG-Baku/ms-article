@@ -1,5 +1,6 @@
-package az.gdg.msarticle.service
+package az.gdg.msarticle.service.impl
 
+import az.gdg.msarticle.exception.ArticleNotFoundException
 import az.gdg.msarticle.exception.NoSuchArticleException
 import az.gdg.msarticle.exception.UnauthorizedAccessException
 import az.gdg.msarticle.mapper.ArticleMapper
@@ -11,6 +12,7 @@ import az.gdg.msarticle.model.entity.TagEntity
 import az.gdg.msarticle.repository.ArticleRepository
 import az.gdg.msarticle.repository.CommentRepository
 import az.gdg.msarticle.security.UserAuthentication
+import az.gdg.msarticle.service.MsAuthService
 import az.gdg.msarticle.service.impl.ArticleServiceImpl
 import org.springframework.security.core.context.SecurityContextHolder
 import spock.lang.Specification
@@ -143,6 +145,42 @@ class ArticleServiceTest extends Specification {
         then: "get article"
             1 * articleRepository.findById(articleId) >> Optional.of(articleEntity)
             thrown(UnauthorizedAccessException)
+    }
+
+    def "add read count if article is found"() {
+        given:
+            def articleEntity = new ArticleEntity()
+            articleEntity.setUserId(3)
+            articleEntity.setId("1")
+            articleEntity.setReadCount(12)
+            def article = Optional.of(articleEntity)
+
+
+        when:
+            articleServiceImpl.addReadCount(articleEntity.getId())
+
+        then:
+            1 * articleRepository.findById(articleEntity.getId()) >> article
+            1 * msAuthService.addPopularity(articleEntity.getUserId())
+            1 * articleRepository.save(articleEntity)
+            notThrown(ArticleNotFoundException)
+
+
+    }
+
+    def "throw ArticleNotFoundException and don't add read count if article is not found"() {
+        given:
+            def articleEntity = Optional.empty()
+            def articleId = "1"
+
+        when:
+            articleServiceImpl.addReadCount(articleId)
+
+        then:
+            1 * articleRepository.findById(articleId) >> articleEntity
+            thrown(ArticleNotFoundException)
+
+
     }
 
 }

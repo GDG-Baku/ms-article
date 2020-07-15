@@ -5,6 +5,7 @@ import az.gdg.msarticle.model.dto.UserDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 
 import static az.gdg.msarticle.model.client.auth.HttpHeader.X_AUTH_TOKEN;
@@ -18,4 +19,7 @@ public interface MsAuthService {
 
     @GetMapping("/user/info")
     UserInfo getUserInfo(@RequestHeader(X_AUTH_TOKEN) String token);
+
+    @PutMapping("/user/popularity/{userId}")
+    void addPopularity(@PathVariable("userId") Long userId);
 }

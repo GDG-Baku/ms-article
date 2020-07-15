@@ -1,6 +1,5 @@
 package az.gdg.msarticle.service.impl;
 
-import az.gdg.msarticle.client.MsAuthClient;
 import az.gdg.msarticle.exception.ArticleNotFoundException;
 import az.gdg.msarticle.model.entity.ArticleEntity;
 import az.gdg.msarticle.repository.ArticleRepository;
@@ -13,29 +12,15 @@ import az.gdg.msarticle.mapper.CommentMapper;
 import az.gdg.msarticle.model.dto.ArticleDTO;
 import az.gdg.msarticle.model.dto.CommentDTO;
 import az.gdg.msarticle.model.dto.UserDTO;
-import az.gdg.msarticle.model.entity.ArticleEntity;
 import az.gdg.msarticle.model.entity.CommentEntity;
-import az.gdg.msarticle.repository.ArticleRepository;
 import az.gdg.msarticle.repository.CommentRepository;
-import az.gdg.msarticle.service.ArticleService;
 import az.gdg.msarticle.service.MsAuthService;
 import az.gdg.msarticle.util.AuthUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-@Service
-public class ArticleServiceImpl implements ArticleService {
-
-    private static final Logger logger = LoggerFactory.getLogger(ArticleServiceImpl.class);
-    private final ArticleRepository articleRepository;
-    private final MsAuthClient msAuthClient;
-
-    public ArticleServiceImpl(ArticleRepository articleRepository, MsAuthClient msAuthClient) {
-        this.articleRepository = articleRepository;
-        this.msAuthClient = msAuthClient;
 import java.util.List;
-
 
 @Service
 public class ArticleServiceImpl implements ArticleService {
@@ -63,11 +48,12 @@ public class ArticleServiceImpl implements ArticleService {
         Integer count = articleEntity.getReadCount();
         articleEntity.setReadCount(count + 1);
 
-        msAuthClient.addPopularity(userId);
+        msAuthService.addPopularity(userId);
         articleRepository.save(articleEntity);
 
         logger.info("ActionLog.addReadCount.stop.success");
     }
+
     public void deleteArticleById(String articleID) {
         logger.info("ActionLog.deleteArticleById.start");
         Long userId = Long.parseLong((String) AuthUtil.getAuthenticatedObject().getPrincipal());
