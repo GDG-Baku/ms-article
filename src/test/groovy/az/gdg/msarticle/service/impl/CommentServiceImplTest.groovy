@@ -2,7 +2,6 @@ package az.gdg.msarticle.service.impl
 
 import az.gdg.msarticle.exception.ArticleNotFoundException
 import az.gdg.msarticle.exception.CommentNotFoundException
-import az.gdg.msarticle.exception.InvalidTokenException
 import az.gdg.msarticle.exception.NoAccessException
 import az.gdg.msarticle.exception.NotAllowedException
 import az.gdg.msarticle.mapper.CommentMapper

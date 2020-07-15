@@ -8,4 +8,6 @@ public interface ArticleService {
 
     void deleteArticleById(String articleId);
 
+    void addReadCount(String articleId);
+
 }

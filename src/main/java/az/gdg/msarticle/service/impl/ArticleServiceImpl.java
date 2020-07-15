@@ -1,5 +1,6 @@
 package az.gdg.msarticle.service.impl;
 
+import az.gdg.msarticle.exception.ArticleNotFoundException;
 import az.gdg.msarticle.exception.InvalidTokenException;
 import az.gdg.msarticle.exception.NoSuchArticleException;
 import az.gdg.msarticle.exception.UnauthorizedAccessException;
@@ -21,7 +22,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-
 @Service
 public class ArticleServiceImpl implements ArticleService {
     private static final Logger logger = LoggerFactory.getLogger(ArticleServiceImpl.class);
@@ -39,6 +39,21 @@ public class ArticleServiceImpl implements ArticleService {
 
 
     @Override
+    public void addReadCount(String articleId) {
+        logger.info("ActionLog.addReadCount.start.articleId : {}", articleId);
+        ArticleEntity articleEntity = articleRepository.findById(articleId)
+                .orElseThrow(() -> new ArticleNotFoundException("Not found such article"));
+
+        Long userId = articleEntity.getUserId();
+        Integer count = articleEntity.getReadCount();
+        articleEntity.setReadCount(count + 1);
+
+        msAuthService.addPopularity(userId);
+        articleRepository.save(articleEntity);
+
+        logger.info("ActionLog.addReadCount.stop.success");
+    }
+
     public void deleteArticleById(String articleID) {
         logger.info("ActionLog.deleteArticleById.start");
         Long userId = Long.parseLong((String) AuthUtil.getAuthenticatedObject().getPrincipal());

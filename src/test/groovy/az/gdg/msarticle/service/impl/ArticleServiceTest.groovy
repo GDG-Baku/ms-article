@@ -1,5 +1,6 @@
-package az.gdg.msarticle.service
+package az.gdg.msarticle.service.impl
 
+import az.gdg.msarticle.exception.ArticleNotFoundException
 import az.gdg.msarticle.exception.NoSuchArticleException
 import az.gdg.msarticle.exception.UnauthorizedAccessException
 import az.gdg.msarticle.mapper.ArticleMapper
@@ -11,6 +12,7 @@ import az.gdg.msarticle.model.entity.TagEntity
 import az.gdg.msarticle.repository.ArticleRepository
 import az.gdg.msarticle.repository.CommentRepository
 import az.gdg.msarticle.security.UserAuthentication
+import az.gdg.msarticle.service.MsAuthService
 import az.gdg.msarticle.service.impl.ArticleServiceImpl
 import org.springframework.security.core.context.SecurityContextHolder
 import spock.lang.Specification
@@ -31,7 +33,7 @@ class ArticleServiceTest extends Specification {
         commentRepository = Mock()
         articleServiceImpl = new ArticleServiceImpl(articleRepository, msAuthService, commentRepository)
     }
-    
+
     def "should use the repository to fetch article by id"() {
         given:
             def articleId = "5eac708be7179a42f172de4c"
@@ -48,26 +50,26 @@ class ArticleServiceTest extends Specification {
 
         when:
             def res = articleServiceImpl.getArticleById(articleId)
-        
+
         then: "get article"
             1 * articleRepository.findById(articleId) >> Optional.of(articleEntity)
             1 * msAuthService.getUserById(articleEntity.userId) >> userDTO
-            
+
             res == articleDTO
     }
-    
+
     def "should throw NoSuchArticleException if no such article"() {
         given:
             def articleId = "dasdpksapdksaop"
-        
+
         when:
             articleServiceImpl.getArticleById(articleId)
-        
+
         then:
             1 * articleRepository.findById(articleId) >> Optional.empty()
             thrown(NoSuchArticleException)
     }
-    
+
     def "should throw UnauthorizedAccessException if not logged and article is draft"() {
         given:
             def articleId = "5eac708be7179a42f172de4c"
@@ -78,15 +80,15 @@ class ArticleServiceTest extends Specification {
                     hateCount: 5, readCount: 75, isDraft: true, isApproved: false, approverId: 41, tags: [tag], comments: [comment])
             def userAuthentication = null
             SecurityContextHolder.getContext().setAuthentication(userAuthentication)
-        
+
         when:
             articleServiceImpl.getArticleById(articleId)
-        
+
         then: "get article"
             1 * articleRepository.findById(articleId) >> Optional.of(articleEntity)
             thrown(UnauthorizedAccessException)
     }
-    
+
     def "should throw UnauthorizedAccessException if it's not own article and is draft"() {
         given:
             def articleId = "5eac708be7179a42f172de4c"
@@ -97,10 +99,10 @@ class ArticleServiceTest extends Specification {
                     hateCount: 5, readCount: 75, isDraft: true, isApproved: false, approverId: 41, tags: [tag], comments: [comment])
             def userAuthentication = new UserAuthentication("15", true)
             SecurityContextHolder.getContext().setAuthentication(userAuthentication)
-        
+
         when:
             articleServiceImpl.getArticleById(articleId)
-        
+
         then:
             1 * articleRepository.findById(articleId) >> Optional.of(articleEntity)
             thrown(UnauthorizedAccessException)
@@ -143,6 +145,42 @@ class ArticleServiceTest extends Specification {
         then: "get article"
             1 * articleRepository.findById(articleId) >> Optional.of(articleEntity)
             thrown(UnauthorizedAccessException)
+    }
+
+    def "add read count if article is found"() {
+        given:
+            def articleEntity = new ArticleEntity()
+            articleEntity.setUserId(3)
+            articleEntity.setId("1")
+            articleEntity.setReadCount(12)
+            def article = Optional.of(articleEntity)
+
+
+        when:
+            articleServiceImpl.addReadCount(articleEntity.getId())
+
+        then:
+            1 * articleRepository.findById(articleEntity.getId()) >> article
+            1 * msAuthService.addPopularity(articleEntity.getUserId())
+            1 * articleRepository.save(articleEntity)
+            notThrown(ArticleNotFoundException)
+
+
+    }
+
+    def "throw ArticleNotFoundException and don't add read count if article is not found"() {
+        given:
+            def articleEntity = Optional.empty()
+            def articleId = "1"
+
+        when:
+            articleServiceImpl.addReadCount(articleId)
+
+        then:
+            1 * articleRepository.findById(articleId) >> articleEntity
+            thrown(ArticleNotFoundException)
+
+
     }
 
 }
