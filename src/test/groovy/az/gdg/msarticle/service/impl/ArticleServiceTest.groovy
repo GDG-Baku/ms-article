@@ -33,7 +33,7 @@ class ArticleServiceTest extends Specification {
         commentRepository = Mock()
         articleServiceImpl = new ArticleServiceImpl(articleRepository, msAuthService, commentRepository)
     }
-    
+
     def "should use the repository to fetch article by id"() {
         given:
             def articleId = "5eac708be7179a42f172de4c"
@@ -50,26 +50,26 @@ class ArticleServiceTest extends Specification {
 
         when:
             def res = articleServiceImpl.getArticleById(articleId)
-        
+
         then: "get article"
             1 * articleRepository.findById(articleId) >> Optional.of(articleEntity)
             1 * msAuthService.getUserById(articleEntity.userId) >> userDTO
-            
+
             res == articleDTO
     }
-    
+
     def "should throw NoSuchArticleException if no such article"() {
         given:
             def articleId = "dasdpksapdksaop"
-        
+
         when:
             articleServiceImpl.getArticleById(articleId)
-        
+
         then:
             1 * articleRepository.findById(articleId) >> Optional.empty()
             thrown(NoSuchArticleException)
     }
-    
+
     def "should throw UnauthorizedAccessException if not logged and article is draft"() {
         given:
             def articleId = "5eac708be7179a42f172de4c"
@@ -80,15 +80,15 @@ class ArticleServiceTest extends Specification {
                     hateCount: 5, readCount: 75, isDraft: true, isApproved: false, approverId: 41, tags: [tag], comments: [comment])
             def userAuthentication = null
             SecurityContextHolder.getContext().setAuthentication(userAuthentication)
-        
+
         when:
             articleServiceImpl.getArticleById(articleId)
-        
+
         then: "get article"
             1 * articleRepository.findById(articleId) >> Optional.of(articleEntity)
             thrown(UnauthorizedAccessException)
     }
-    
+
     def "should throw UnauthorizedAccessException if it's not own article and is draft"() {
         given:
             def articleId = "5eac708be7179a42f172de4c"
@@ -99,10 +99,10 @@ class ArticleServiceTest extends Specification {
                     hateCount: 5, readCount: 75, isDraft: true, isApproved: false, approverId: 41, tags: [tag], comments: [comment])
             def userAuthentication = new UserAuthentication("15", true)
             SecurityContextHolder.getContext().setAuthentication(userAuthentication)
-        
+
         when:
             articleServiceImpl.getArticleById(articleId)
-        
+
         then:
             1 * articleRepository.findById(articleId) >> Optional.of(articleEntity)
             thrown(UnauthorizedAccessException)

@@ -17,8 +17,7 @@ swagger:
 client:
   service:
     url:
-#      ms-auth: ${SERVICE_URL_MS-AUTH}
-      ms-auth: http://localhost:8081
+      ms-auth: ${SERVICE_URL_MS-AUTH}
 
 
   rabbitmq:
