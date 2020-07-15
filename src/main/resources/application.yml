@@ -3,10 +3,25 @@ server:
   servlet:
     context-path: /api
 
+logging:
+  level:
+    org:
+      springframework:
+        web: DEBUG
 spring:
   data:
     mongodb:
       uri: ${MONGODB_URI}
+
+swagger:
+  enabled: true
+
+client:
+  service:
+    url:
+      ms-auth: ${SERVICE_URL_MS-AUTH}
+
+
   rabbitmq:
     addresses: xxx
   cloud:
@@ -16,7 +31,3 @@ spring:
           destination: mail
           group: mail-group
 
-client:
-  service:
-    url:
-      ms-auth: https://gdg-ms-auth.herokuapp.com

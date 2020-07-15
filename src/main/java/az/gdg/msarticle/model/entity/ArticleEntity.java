@@ -13,11 +13,10 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.time.LocalDateTime;
 import java.util.List;
 
-
 @Data
-@Builder
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Document(collection = "articles")
 public class ArticleEntity {
     @Id
@@ -25,14 +24,11 @@ public class ArticleEntity {
     private Long userId;
     private String title;
     private String content;
-    private String type;
-
+    private Integer type;
     @CreatedDate
     private LocalDateTime createdAt;
-
     @LastModifiedDate
     private LocalDateTime updatedAt;
-
     private Integer quackCount;
     private Integer hateCount;
     private Integer readCount;

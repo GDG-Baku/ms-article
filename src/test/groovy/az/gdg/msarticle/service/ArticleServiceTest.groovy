@@ -24,7 +24,7 @@ class ArticleServiceTest extends Specification {
     ArticleServiceImpl articleServiceImpl
     MsAuthService msAuthService
     CommentRepository commentRepository
-    
+
     def setup() {
         articleRepository = Mock()
         msAuthService = Mock()
@@ -45,7 +45,7 @@ class ArticleServiceTest extends Specification {
             SecurityContextHolder.getContext().setAuthentication(userAuthentication)
             def articleDTO = ArticleMapper.INSTANCE.entityToDto(articleEntity, userDTO)
             articleDTO.setComments(Collections.singletonList(new CommentDTO()))
-        
+
         when:
             def res = articleServiceImpl.getArticleById(articleId)
         
@@ -105,7 +105,7 @@ class ArticleServiceTest extends Specification {
             1 * articleRepository.findById(articleId) >> Optional.of(articleEntity)
             thrown(UnauthorizedAccessException)
     }
-    
+
     def "should use the repository to delete article by id"() {
         given:
             def articleId = "5eac708be7179a42f172de4c"
@@ -116,16 +116,16 @@ class ArticleServiceTest extends Specification {
                     hateCount: 5, readCount: 75, isDraft: false, isApproved: true, approverId: 41, tags: [tag], comments: [comment])
             def userAuthentication = new UserAuthentication("41", true)
             SecurityContextHolder.getContext().setAuthentication(userAuthentication)
-        
+
         when:
             articleServiceImpl.deleteArticleById(articleId)
-        
+
         then: "get article"
             1 * articleRepository.findById(articleId) >> Optional.of(articleEntity)
             1 * commentRepository.deleteAll(articleEntity.getComments())
             1 * articleRepository.deleteById(articleId)
     }
-    
+
     def "should throw UnauthorizedAccessException if it's not own article"() {
         given:
             def articleId = "5eac708be7179a42f172de4c"
@@ -136,13 +136,13 @@ class ArticleServiceTest extends Specification {
                     hateCount: 5, readCount: 75, isDraft: false, isApproved: true, approverId: 41, tags: [tag], comments: [comment])
             def userAuthentication = new UserAuthentication("10", true)
             SecurityContextHolder.getContext().setAuthentication(userAuthentication)
-        
+
         when:
             articleServiceImpl.deleteArticleById(articleId)
-        
+
         then: "get article"
             1 * articleRepository.findById(articleId) >> Optional.of(articleEntity)
             thrown(UnauthorizedAccessException)
     }
-    
+
 }

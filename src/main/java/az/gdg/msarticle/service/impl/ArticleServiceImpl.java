@@ -82,6 +82,7 @@ public class ArticleServiceImpl implements ArticleService {
         UserDTO userDTO = msAuthService.getUserById(userId);
         ArticleDTO articleDTO = ArticleMapper.INSTANCE.entityToDto(articleEntity, userDTO);
         articleDTO.setComments(getCommentDTOsWithUserDTO(articleEntity.getComments()));
+        articleDTO.setComments(CommentMapper.INSTANCE.entityToDtoList(articleEntity.getComments()));
 
         logger.info("ActionLog.getArticleById.end with id {}", articleId);
         return articleDTO;
