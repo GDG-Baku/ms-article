@@ -23,7 +23,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public String deleteComment(String id) {
-        logger.info("ActionLog.deleteComment.start with id {}", id);
+        logger.info("ServiceLog.deleteComment.start with id {}", id);
         String message;
 
         String userId = (String) AuthUtil.getAuthenticatedObject().getPrincipal();
@@ -36,12 +36,12 @@ public class CommentServiceImpl implements CommentService {
                 commentRepository.deleteAll(commentEntity.getReplies());
             }
             commentRepository.deleteById(id);
-            logger.info("ActionLog.deleteComment.success with id {}", id);
+            logger.info("ServiceLog.deleteComment.success with id {}", id);
             message = "Comment is deleted";
         } else {
             throw new NoAccessException(NO_ACCESS_TO_REQUEST);
         }
-        logger.info("ActionLog.deleteComment.end with id {}", id);
+        logger.info("ServiceLog.deleteComment.end with id {}", id);
         return message;
     }
 }

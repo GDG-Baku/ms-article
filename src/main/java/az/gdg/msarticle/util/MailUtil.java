@@ -31,10 +31,10 @@ public class MailUtil {
     }
 
     public static void sendMail(String articleId, String requestType, MailService mailService) {
-        logger.info("ActionLog.sendMail.start");
+        logger.info("ServiceLog.sendMail.start");
         String mailBody = "Author that has article with id " + articleId + " wants to " + requestType + " it.<br>" +
                 "Please review article before " + requestType;
         mailService.sendToQueue(buildMail(mailBody));
-        logger.info("ActionLog.sendMail.end");
+        logger.info("ServiceLog.sendMail.end");
     }
 }

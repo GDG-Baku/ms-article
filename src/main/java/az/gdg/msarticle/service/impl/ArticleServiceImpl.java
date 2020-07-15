@@ -29,7 +29,7 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     public String publishArticle(String articleId) {
-        logger.info("ActionLog.publishArticle.start with articleId {}", articleId);
+        logger.info("ServiceLog.publishArticle.start with articleId {}", articleId);
         String userId = (String) AuthUtil.getAuthenticatedObject().getPrincipal();
         String message;
         ArticleEntity articleEntity = articleRepository.findById(articleId)
@@ -38,14 +38,14 @@ public class ArticleServiceImpl implements ArticleService {
         if (String.valueOf(articleEntity.getUserId()).equals(userId)) {
             if (articleEntity.isDraft()) {
                 MailUtil.sendMail(articleId, "publish", mailService);
-                logger.info("ActionLog.publishArticle.success");
+                logger.info("ServiceLog.publishArticle.success");
                 message = "Article is sent for reviewing";
             } else {
                 throw new NoDraftedArticleExist("Article is already published");
             }
             return message;
         }
-        logger.info("ActionLog.publishArticle.end");
+        logger.info("ServiceLog.publishArticle.end");
         throw new NoAccessException(NO_ACCESS_TO_REQUEST);
     }
 }
