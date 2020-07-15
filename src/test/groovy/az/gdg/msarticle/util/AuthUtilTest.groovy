@@ -6,8 +6,6 @@ import org.springframework.security.core.context.SecurityContextHolder
 import spock.lang.Specification
 
 class AuthUtilTest extends Specification {
-    void setup() {
-    }
 
     def "should return authenticated object"() {
         given:

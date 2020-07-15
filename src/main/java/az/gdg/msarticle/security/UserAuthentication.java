@@ -5,7 +5,7 @@ import java.util.Collection;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 
-public class UserAuthentication  implements Authentication {
+public class UserAuthentication implements Authentication {
 
     private String userId;
     private boolean authenticated;
