@@ -9,16 +9,7 @@ logging:
 spring:
   data:
     mongodb:
-      uri: ${MONGODB_URI}
-
-swagger:
-  enabled: true
-
-client:
-  service:
-    url:
-      ms-auth: ${SERVICE_URL_MS-AUTH}
-
+      uri: xxx
 
   rabbitmq:
     addresses: xxx
@@ -29,3 +20,10 @@ client:
           destination: mail
           group: mail-group
 
+swagger:
+  enabled: true
+
+client:
+  service:
+    url:
+      ms-auth: xxx

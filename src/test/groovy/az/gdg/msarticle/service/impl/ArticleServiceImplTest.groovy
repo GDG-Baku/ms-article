@@ -1,6 +1,8 @@
 package az.gdg.msarticle.service.impl
 
+import az.gdg.msarticle.client.TeamClient
 import az.gdg.msarticle.exception.ArticleNotFoundException
+import az.gdg.msarticle.exception.MembersNotFoundException
 import az.gdg.msarticle.exception.NoDraftedArticleExist
 import az.gdg.msarticle.exception.NoSuchArticleException
 import az.gdg.msarticle.exception.UnauthorizedAccessException
@@ -26,13 +28,16 @@ class ArticleServiceImplTest extends Specification {
     private def articleServiceImpl
     private MsAuthService msAuthService
     private CommentRepository commentRepository
+    private def teamClient
 
     void setup() {
         articleRepository = Mock(ArticleRepository)
         mailService = Mock(MailServiceImpl)
         msAuthService = Mock()
         commentRepository = Mock()
-        articleServiceImpl = new ArticleServiceImpl(articleRepository, msAuthService, commentRepository, mailService)
+        teamClient = Mock(TeamClient)
+        articleServiceImpl = new ArticleServiceImpl(articleRepository, msAuthService, commentRepository,
+                mailService, teamClient)
     }
 
     def "should send email while trying to publish article"() {
@@ -44,14 +49,17 @@ class ArticleServiceImplTest extends Specification {
             articleEntity.setId(articleId)
             articleEntity.setUserId(2)
             articleEntity.setDraft(true)
+            def memberMails = ["member@gmail.com"]
             articleRepository.findById(articleId) >> Optional.of(articleEntity)
+            teamClient.getAllMails() >> memberMails
         when:
             articleServiceImpl.publishArticle(articleId)
         then:
             1 * mailService.sendToQueue(_)
             notThrown(exception)
         where:
-            exception << [NoSuchArticleException, UnauthorizedAccessException, NoDraftedArticleExist]
+            exception << [NoSuchArticleException, UnauthorizedAccessException,
+                          NoDraftedArticleExist, MembersNotFoundException]
     }
 
     def "should throw UnauthorizedAccessException when not authorized user tries to publish"() {
@@ -95,6 +103,24 @@ class ArticleServiceImplTest extends Specification {
             articleServiceImpl.publishArticle(articleId)
         then:
             thrown(NoDraftedArticleExist)
+    }
+
+    def "should throw MembersNotFoundException when retrieving members from ms-team is failed"() {
+        given:
+            def articleId = "1"
+            def articleEntity = new ArticleEntity()
+            def userAuthentication = new UserAuthentication("2", true)
+            SecurityContextHolder.getContext().setAuthentication(userAuthentication)
+            articleEntity.setId(articleId)
+            articleEntity.setUserId(2)
+            articleEntity.setDraft(true)
+            def memberMails = []
+            articleRepository.findById(articleId) >> Optional.of(articleEntity)
+            teamClient.getAllMails() >> memberMails
+        when:
+            articleServiceImpl.publishArticle(articleId)
+        then:
+            thrown(MembersNotFoundException)
     }
 
     def "should use the repository to fetch article by id"() {

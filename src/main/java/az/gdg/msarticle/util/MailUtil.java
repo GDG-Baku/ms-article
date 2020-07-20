@@ -3,7 +3,6 @@ package az.gdg.msarticle.util;
 import az.gdg.msarticle.model.client.mail.MailDTO;
 import az.gdg.msarticle.service.MailService;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -15,14 +14,7 @@ public class MailUtil {
     private MailUtil() {
     }
 
-    public static MailDTO buildMail(String mailBody) {
-        List<String> receivers = new ArrayList<>();
-        receivers.add("gdg.rubber.duck@gmail.com");
-        receivers.add("movsum.nigar@gmail.com");
-        receivers.add("asif.hajiyev@outlook.com");
-        receivers.add("huseynov_ali@outlook.com");
-        receivers.add("isgandarli_murad@mail.ru");
-
+    public static MailDTO buildMail(List<String> receivers, String mailBody) {
         return MailDTO.builder()
                 .to(receivers)
                 .body("<h2>" + mailBody + "</h2>")
@@ -30,11 +22,12 @@ public class MailUtil {
                 .build();
     }
 
-    public static void sendMail(String articleId, String requestType, MailService mailService) {
+    public static void sendMail(String articleId, String requestType,
+                                MailService mailService, List<String> receivers) {
         logger.info("ServiceLog.sendMail.start");
         String mailBody = "Author that has article with id " + articleId + " wants to " + requestType + " it.<br>" +
                 "Please review article before " + requestType;
-        mailService.sendToQueue(buildMail(mailBody));
+        mailService.sendToQueue(buildMail(receivers, mailBody));
         logger.info("ServiceLog.sendMail.end");
     }
 }

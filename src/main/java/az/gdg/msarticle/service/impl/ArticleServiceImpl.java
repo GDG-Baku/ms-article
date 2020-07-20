@@ -1,7 +1,9 @@
 package az.gdg.msarticle.service.impl;
 
+import az.gdg.msarticle.client.TeamClient;
 import az.gdg.msarticle.exception.ArticleNotFoundException;
 import az.gdg.msarticle.exception.InvalidTokenException;
+import az.gdg.msarticle.exception.MembersNotFoundException;
 import az.gdg.msarticle.exception.NoDraftedArticleExist;
 import az.gdg.msarticle.exception.NoSuchArticleException;
 import az.gdg.msarticle.exception.UnauthorizedAccessException;
@@ -33,15 +35,18 @@ public class ArticleServiceImpl implements ArticleService {
     private final MsAuthService msAuthService;
     private final CommentRepository commentRepository;
     private final MailService mailService;
+    private final TeamClient teamClient;
 
     public ArticleServiceImpl(ArticleRepository articleRepository,
                               MsAuthService msAuthService,
                               CommentRepository commentRepository,
-                              MailService mailService) {
+                              MailService mailService,
+                              TeamClient teamClient) {
         this.articleRepository = articleRepository;
         this.msAuthService = msAuthService;
         this.commentRepository = commentRepository;
         this.mailService = mailService;
+        this.teamClient = teamClient;
     }
 
 
@@ -124,15 +129,21 @@ public class ArticleServiceImpl implements ArticleService {
     public String publishArticle(String articleId) {
         logger.info("ServiceLog.publishArticle.start with articleId {}", articleId);
         String userId = (String) AuthUtil.getAuthenticatedObject().getPrincipal();
+        List<String> memberMails;
         String message;
         ArticleEntity articleEntity = articleRepository.findById(articleId)
                 .orElseThrow(() -> new NoSuchArticleException("Article doesn't exist with this id" + articleId));
 
         if (String.valueOf(articleEntity.getUserId()).equals(userId)) {
             if (articleEntity.isDraft()) {
-                MailUtil.sendMail(articleId, "publish", mailService);
-                logger.info("ServiceLog.publishArticle.success");
-                message = "Article is sent for reviewing";
+                memberMails = teamClient.getAllMails();
+                if (memberMails != null && !memberMails.isEmpty()) {
+                    MailUtil.sendMail(articleId, "publish", mailService, memberMails);
+                    logger.info("ServiceLog.publishArticle.success");
+                    message = "Article is sent for reviewing";
+                } else {
+                    throw new MembersNotFoundException("Sending publish request is failed");
+                }
             } else {
                 throw new NoDraftedArticleExist("Article is already published");
             }
