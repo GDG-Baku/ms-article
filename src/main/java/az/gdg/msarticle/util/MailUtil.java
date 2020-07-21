@@ -24,9 +24,9 @@ public class MailUtil {
 
     public static void sendMail(String articleId, String requestType,
                                 MailService mailService, List<String> receivers) {
-        logger.info("ServiceLog.sendMail.start");
-        String mailBody = "Author that has article with id " + articleId + " wants to " + requestType + " it.<br>" +
-                "Please review article before " + requestType;
+        logger.info("ServiceLog.sendMail.start with articleId {} and requestType: {}", articleId, requestType);
+        String mailBody = String.format("Author that has article with id %s wants to %s it.<br>" +
+                "Please review article before %s", articleId, requestType, requestType);
         mailService.sendToQueue(buildMail(receivers, mailBody));
         logger.info("ServiceLog.sendMail.end");
     }

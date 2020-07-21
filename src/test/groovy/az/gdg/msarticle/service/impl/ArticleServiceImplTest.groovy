@@ -3,7 +3,7 @@ package az.gdg.msarticle.service.impl
 import az.gdg.msarticle.client.TeamClient
 import az.gdg.msarticle.exception.ArticleNotFoundException
 import az.gdg.msarticle.exception.MembersNotFoundException
-import az.gdg.msarticle.exception.NoDraftedArticleExist
+import az.gdg.msarticle.exception.AlreadyPublishedArticleException
 import az.gdg.msarticle.exception.NoSuchArticleException
 import az.gdg.msarticle.exception.UnauthorizedAccessException
 import az.gdg.msarticle.mapper.ArticleMapper
@@ -59,7 +59,7 @@ class ArticleServiceImplTest extends Specification {
             notThrown(exception)
         where:
             exception << [NoSuchArticleException, UnauthorizedAccessException,
-                          NoDraftedArticleExist, MembersNotFoundException]
+                          AlreadyPublishedArticleException, MembersNotFoundException]
     }
 
     def "should throw UnauthorizedAccessException when not authorized user tries to publish"() {
@@ -89,7 +89,7 @@ class ArticleServiceImplTest extends Specification {
             thrown(NoSuchArticleException)
     }
 
-    def "should throw NoDraftedArticleExist when article is already published"() {
+    def "should throw AlreadyPublishedArticleException when article is already published"() {
         given:
             def articleId = "1"
             def articleEntity = new ArticleEntity()
@@ -102,7 +102,7 @@ class ArticleServiceImplTest extends Specification {
         when:
             articleServiceImpl.publishArticle(articleId)
         then:
-            thrown(NoDraftedArticleExist)
+            thrown(AlreadyPublishedArticleException)
     }
 
     def "should throw MembersNotFoundException when retrieving members from ms-team is failed"() {

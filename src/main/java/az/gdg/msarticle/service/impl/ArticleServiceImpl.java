@@ -4,7 +4,7 @@ import az.gdg.msarticle.client.TeamClient;
 import az.gdg.msarticle.exception.ArticleNotFoundException;
 import az.gdg.msarticle.exception.InvalidTokenException;
 import az.gdg.msarticle.exception.MembersNotFoundException;
-import az.gdg.msarticle.exception.NoDraftedArticleExist;
+import az.gdg.msarticle.exception.AlreadyPublishedArticleException;
 import az.gdg.msarticle.exception.NoSuchArticleException;
 import az.gdg.msarticle.exception.UnauthorizedAccessException;
 import az.gdg.msarticle.mapper.ArticleMapper;
@@ -145,7 +145,7 @@ public class ArticleServiceImpl implements ArticleService {
                     throw new MembersNotFoundException("Sending publish request is failed");
                 }
             } else {
-                throw new NoDraftedArticleExist("Article is already published");
+                throw new AlreadyPublishedArticleException("Article is already published");
             }
             return message;
         }
