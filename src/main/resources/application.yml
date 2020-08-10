@@ -9,10 +9,10 @@ logging:
 spring:
   data:
     mongodb:
-      uri: xxx
+      uri: ${MONGODB_URI}
 
   rabbitmq:
-    addresses: xxx
+    addresses: ${SPRING_RABBITMQ_ADDRESSES}
   cloud:
     stream:
       bindings:
@@ -26,4 +26,4 @@ swagger:
 client:
   service:
     url:
-      ms-auth: xxx
+      ms-auth: ${CLIENT_SERVICE_URL_MS-AUTH}
