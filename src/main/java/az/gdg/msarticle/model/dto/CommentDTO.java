@@ -14,10 +14,8 @@ import java.util.List;
 @NoArgsConstructor
 public class CommentDTO {
     private String id;
-    private Integer userId;
-    private String firstName;
-    private String lastName;
-    private String imageUrl;
+    private Long userId;
+    private UserDTO userDTO;
     private String text;
     private LocalDateTime createdAt;
     private List<CommentDTO> replies;

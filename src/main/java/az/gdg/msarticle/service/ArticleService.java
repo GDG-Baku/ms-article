@@ -1,9 +1,16 @@
 package az.gdg.msarticle.service;
 
-import az.gdg.msarticle.model.dto.UserArticleDTO;
+import az.gdg.msarticle.model.dto.ArticleDTO;
 
 public interface ArticleService {
 
-    UserArticleDTO getArticlesByUserId(Integer userId, int page);
+    ArticleDTO getArticleById(String articleId);
 
+    void deleteArticleById(String articleId);
+
+    void addReadCount(String articleId);
+
+    String publishArticle(String articleId);
+
+    UserArticleDTO getArticlesByUserId(Integer userId, int page);
 }

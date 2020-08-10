@@ -12,4 +12,5 @@ import lombok.NoArgsConstructor;
 public class UserInfo {
     private String userId;
     private String role;
+    private String mail;
 }

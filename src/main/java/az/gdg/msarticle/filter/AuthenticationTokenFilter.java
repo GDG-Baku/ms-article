@@ -1,9 +1,9 @@
 package az.gdg.msarticle.filter;
 
-import az.gdg.msarticle.client.AuthenticationClient;
-import az.gdg.msarticle.exception.NotValidException;
+import az.gdg.msarticle.exception.WrongDataException;
 import az.gdg.msarticle.model.client.auth.UserInfo;
 import az.gdg.msarticle.security.UserAuthentication;
+import az.gdg.msarticle.service.MsAuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -19,11 +19,11 @@ import static az.gdg.msarticle.model.client.auth.HttpHeader.X_AUTH_TOKEN;
 
 @Component
 public class AuthenticationTokenFilter extends OncePerRequestFilter {
-    private AuthenticationClient authenticationClient;
+    private MsAuthService msAuthService;
 
     @Autowired
-    public void setAuthenticationClient(AuthenticationClient authenticationClient) {
-        this.authenticationClient = authenticationClient;
+    public void setAuthenticationClient(MsAuthService msAuthService) {
+        this.msAuthService = msAuthService;
     }
 
     @Override
@@ -32,13 +32,12 @@ public class AuthenticationTokenFilter extends OncePerRequestFilter {
         try {
             String authToken = request.getHeader(X_AUTH_TOKEN);
             if (authToken != null) {
-                UserInfo userInfo = authenticationClient.validateToken(authToken);
+                UserInfo userInfo = msAuthService.getUserInfo(authToken);
                 if (userInfo == null) {
-                    throw new NotValidException("User info is not valid");
+                    throw new WrongDataException("User info is not valid");
                 } else {
                     UserAuthentication userAuthentication = new UserAuthentication(userInfo.getUserId(),
-                            true,
-                            userInfo.getRole());
+                            true);
                     SecurityContextHolder.getContext().setAuthentication(userAuthentication);
                 }
             }

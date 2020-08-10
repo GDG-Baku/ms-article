@@ -1,8 +1,29 @@
+server:
+  port: 8080
+
+logging:
+  level:
+    org:
+      springframework:
+        web: DEBUG
 spring:
   data:
     mongodb:
       uri: ${MONGODB_URI}
-service:
-  ms-auth:
-    url: http://gdg-ms-auth.herokuapp.com
 
+  rabbitmq:
+    addresses: ${SPRING_RABBITMQ_ADDRESSES}
+  cloud:
+    stream:
+      bindings:
+        output:
+          destination: mail
+          group: mail-group
+
+swagger:
+  enabled: true
+
+client:
+  service:
+    url:
+      ms-auth: ${CLIENT_SERVICE_URL_MS-AUTH}
