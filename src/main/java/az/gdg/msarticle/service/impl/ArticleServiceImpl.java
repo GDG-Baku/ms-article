@@ -1,7 +1,10 @@
 package az.gdg.msarticle.service.impl;
 
+import az.gdg.msarticle.client.TeamClient;
+import az.gdg.msarticle.exception.AlreadyPublishedArticleException;
 import az.gdg.msarticle.exception.ArticleNotFoundException;
 import az.gdg.msarticle.exception.InvalidTokenException;
+import az.gdg.msarticle.exception.MembersNotFoundException;
 import az.gdg.msarticle.exception.NoSuchArticleException;
 import az.gdg.msarticle.exception.UnauthorizedAccessException;
 import az.gdg.msarticle.mapper.ArticleMapper;
@@ -14,13 +17,16 @@ import az.gdg.msarticle.model.entity.CommentEntity;
 import az.gdg.msarticle.repository.ArticleRepository;
 import az.gdg.msarticle.repository.CommentRepository;
 import az.gdg.msarticle.service.ArticleService;
+import az.gdg.msarticle.service.MailService;
 import az.gdg.msarticle.service.MsAuthService;
 import az.gdg.msarticle.util.AuthUtil;
+import az.gdg.msarticle.util.MailUtil;
+
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class ArticleServiceImpl implements ArticleService {
@@ -28,19 +34,25 @@ public class ArticleServiceImpl implements ArticleService {
     private final ArticleRepository articleRepository;
     private final MsAuthService msAuthService;
     private final CommentRepository commentRepository;
+    private final MailService mailService;
+    private final TeamClient teamClient;
 
-
-    public ArticleServiceImpl(ArticleRepository articleRepository, MsAuthService msAuthService,
-                              CommentRepository commentRepository) {
+    public ArticleServiceImpl(ArticleRepository articleRepository,
+                              MsAuthService msAuthService,
+                              CommentRepository commentRepository,
+                              MailService mailService,
+                              TeamClient teamClient) {
         this.articleRepository = articleRepository;
         this.msAuthService = msAuthService;
         this.commentRepository = commentRepository;
+        this.mailService = mailService;
+        this.teamClient = teamClient;
     }
 
 
     @Override
     public void addReadCount(String articleId) {
-        logger.info("ActionLog.addReadCount.start.articleId : {}", articleId);
+        logger.info("ServiceLog.addReadCount.start.articleId : {}", articleId);
         ArticleEntity articleEntity = articleRepository.findById(articleId)
                 .orElseThrow(() -> new ArticleNotFoundException("Not found such article"));
 
@@ -51,11 +63,11 @@ public class ArticleServiceImpl implements ArticleService {
         msAuthService.addPopularity(userId);
         articleRepository.save(articleEntity);
 
-        logger.info("ActionLog.addReadCount.stop.success");
+        logger.info("ServiceLog.addReadCount.stop.success");
     }
 
     public void deleteArticleById(String articleID) {
-        logger.info("ActionLog.deleteArticleById.start");
+        logger.info("ServiceLog.deleteArticleById.start");
         Long userId = Long.parseLong((String) AuthUtil.getAuthenticatedObject().getPrincipal());
         ArticleEntity articleEntity = articleRepository.findById(articleID)
                 .orElseThrow(() -> new NoSuchArticleException("Article doesn't exist"));
@@ -79,7 +91,7 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     public ArticleDTO getArticleById(String articleId) {
-        logger.info("ActionLog.getArticleById.start with id {}", articleId);
+        logger.info("ServiceLog.getArticleById.start with id {}", articleId);
         ArticleEntity articleEntity = articleRepository.findById(articleId)
                 .orElseThrow(() -> new NoSuchArticleException("Article doesn't exist"));
         Long userId = articleEntity.getUserId();
@@ -99,7 +111,7 @@ public class ArticleServiceImpl implements ArticleService {
         articleDTO.setComments(getCommentDTOsWithUserDTO(articleEntity.getComments()));
         articleDTO.setComments(CommentMapper.INSTANCE.entityToDtoList(articleEntity.getComments()));
 
-        logger.info("ActionLog.getArticleById.end with id {}", articleId);
+        logger.info("ServiceLog.getArticleById.end with id {}", articleId);
         return articleDTO;
     }
 
@@ -113,4 +125,40 @@ public class ArticleServiceImpl implements ArticleService {
         return commentDTOs;
     }
 
+    @Override
+    public String publishArticle(String articleId) {
+        logger.info("ServiceLog.publishArticle.start with articleId {}", articleId);
+        String userId = (String) AuthUtil.getAuthenticatedObject().getPrincipal();
+        List<String> memberMails;
+        String message;
+        ArticleEntity articleEntity = articleRepository.findById(articleId)
+                .orElseThrow(() -> new NoSuchArticleException("Article doesn't exist with this id" + articleId));
+
+        if (String.valueOf(articleEntity.getUserId()).equals(userId)) {
+            if (articleEntity.isDraft()) {
+                memberMails = teamClient.getAllMails();
+                if (memberMails != null && !memberMails.isEmpty()) {
+                    sendMail(articleId, "publish", memberMails);
+                    logger.info("ServiceLog.publishArticle.success");
+                    message = "Article is sent for reviewing";
+                } else {
+                    throw new MembersNotFoundException("Sending publish request is failed");
+                }
+            } else {
+                throw new AlreadyPublishedArticleException("Article is already published");
+            }
+            return message;
+        }
+        logger.info("ServiceLog.publishArticle.end");
+        throw new UnauthorizedAccessException("You don't have permission to publish this article");
+    }
+
+    public void sendMail(String articleId, String requestType,
+                         List<String> receivers) {
+        logger.info("ServiceLog.sendMail.start with articleId {} and requestType: {}", articleId, requestType);
+        String mailBody = String.format("Author that has article with id %s wants to %s it.<br>" +
+                "Please review article before %s", articleId, requestType, requestType);
+        mailService.sendToQueue(MailUtil.buildMail(receivers, mailBody));
+        logger.info("ServiceLog.sendMail.end with articleId {} and requestType: {}", articleId, requestType);
+    }
 }

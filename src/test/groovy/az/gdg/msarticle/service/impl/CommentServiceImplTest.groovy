@@ -2,8 +2,8 @@ package az.gdg.msarticle.service.impl
 
 import az.gdg.msarticle.exception.ArticleNotFoundException
 import az.gdg.msarticle.exception.CommentNotFoundException
-import az.gdg.msarticle.exception.NoAccessException
 import az.gdg.msarticle.exception.NotAllowedException
+import az.gdg.msarticle.exception.UnauthorizedAccessException
 import az.gdg.msarticle.mapper.CommentMapper
 import az.gdg.msarticle.model.CommentRequest
 import az.gdg.msarticle.model.entity.ArticleEntity
@@ -41,7 +41,7 @@ class CommentServiceImplTest extends Specification {
             1 * commentRepository.deleteById(commentId)
             notThrown(exception)
         where:
-            exception << [NoAccessException, CommentNotFoundException]
+            exception << [UnauthorizedAccessException, CommentNotFoundException]
     }
 
     def "should delete parent comment"() {
@@ -60,10 +60,10 @@ class CommentServiceImplTest extends Specification {
             1 * commentRepository.deleteById(commentId)
             notThrown(exception)
         where:
-            exception << [NoAccessException, CommentNotFoundException]
+            exception << [UnauthorizedAccessException, CommentNotFoundException]
     }
 
-    def "should throw NoAccessException when deleting comment"() {
+    def "should throw UnauthorizedAccessException when deleting comment"() {
         given:
             def commentId = "1"
             def userAuthentication = new UserAuthentication("2", true)
@@ -74,7 +74,7 @@ class CommentServiceImplTest extends Specification {
         when:
             commentService.deleteComment(commentId)
         then:
-            thrown(NoAccessException)
+            thrown(UnauthorizedAccessException)
     }
 
     def "should throw CommentNotFound when deleting comment"() {
@@ -106,16 +106,12 @@ class CommentServiceImplTest extends Specification {
             SecurityContextHolder.getContext().setAuthentication(userAuthentication)
             articleRepository.findById(commentRequest.getArticleId()) >> articleEntity
             commentRepository.findById(commentRequest.getParentCommentId()) >> commentFromDatabase
-
         when:
             commentService.postComment(token, commentRequest)
-
         then:
             1 * commentRepository.save(childComment)
             1 * commentRepository.save(parentComment)
             notThrown(ArticleNotFoundException)
-
-
     }
 
     def "save comment as parent if parentId which is sent with request is empty"() {
@@ -132,16 +128,12 @@ class CommentServiceImplTest extends Specification {
             def userAuthentication = new UserAuthentication("1", true)
             SecurityContextHolder.getContext().setAuthentication(userAuthentication)
             articleRepository.findById(commentRequest.getArticleId()) >> articleEntity
-
         when:
             commentService.postComment(token, commentRequest)
-
         then:
             1 * commentRepository.save(parentComment)
             1 * articleRepository.save(article)
             notThrown(ArticleNotFoundException)
-
-
     }
 
 
@@ -150,15 +142,11 @@ class CommentServiceImplTest extends Specification {
             def commentRequest = new CommentRequest("12345", "Hello", "34567")
             String token = "asdfghjklgthth"
             def articleEntity = Optional.empty()
-
         when:
             commentService.postComment(token, commentRequest)
-
         then:
             1 * articleRepository.findById(commentRequest.getArticleId()) >> articleEntity
             thrown(ArticleNotFoundException)
-
-
     }
 
     def "throw NotAllowedException if comment which is got from database is reply"() {
@@ -180,10 +168,7 @@ class CommentServiceImplTest extends Specification {
             commentService.postComment(token, commentRequest)
 
         then:
-
             thrown(NotAllowedException)
-
-
     }
 
     def "throw CommentNotFoundException if comment is not found in database"() {
@@ -197,16 +182,9 @@ class CommentServiceImplTest extends Specification {
             SecurityContextHolder.getContext().setAuthentication(userAuthentication)
             articleRepository.findById(commentRequest.getArticleId()) >> articleEntity
             commentRepository.findById(commentRequest.getParentCommentId()) >> com
-
         when:
             commentService.postComment(token, commentRequest)
-
         then:
-
             thrown(CommentNotFoundException)
-
-
     }
-
-
 }

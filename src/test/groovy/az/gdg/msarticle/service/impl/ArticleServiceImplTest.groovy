@@ -1,6 +1,9 @@
 package az.gdg.msarticle.service.impl
 
+import az.gdg.msarticle.client.TeamClient
 import az.gdg.msarticle.exception.ArticleNotFoundException
+import az.gdg.msarticle.exception.MembersNotFoundException
+import az.gdg.msarticle.exception.AlreadyPublishedArticleException
 import az.gdg.msarticle.exception.NoSuchArticleException
 import az.gdg.msarticle.exception.UnauthorizedAccessException
 import az.gdg.msarticle.mapper.ArticleMapper
@@ -13,25 +16,111 @@ import az.gdg.msarticle.repository.ArticleRepository
 import az.gdg.msarticle.repository.CommentRepository
 import az.gdg.msarticle.security.UserAuthentication
 import az.gdg.msarticle.service.MsAuthService
-import az.gdg.msarticle.service.impl.ArticleServiceImpl
 import org.springframework.security.core.context.SecurityContextHolder
 import spock.lang.Specification
-import spock.lang.Title
 
 import java.time.LocalDateTime
 
-@Title("Testing for article service implementation for getArticle method")
-class ArticleServiceTest extends Specification {
-    ArticleRepository articleRepository
-    ArticleServiceImpl articleServiceImpl
-    MsAuthService msAuthService
-    CommentRepository commentRepository
+class ArticleServiceImplTest extends Specification {
 
-    def setup() {
-        articleRepository = Mock()
+    private def articleRepository
+    private def mailService
+    private def articleServiceImpl
+    private MsAuthService msAuthService
+    private CommentRepository commentRepository
+    private def teamClient
+
+    void setup() {
+        articleRepository = Mock(ArticleRepository)
+        mailService = Mock(MailServiceImpl)
         msAuthService = Mock()
         commentRepository = Mock()
-        articleServiceImpl = new ArticleServiceImpl(articleRepository, msAuthService, commentRepository)
+        teamClient = Mock(TeamClient)
+        articleServiceImpl = new ArticleServiceImpl(articleRepository, msAuthService, commentRepository,
+                mailService, teamClient)
+    }
+
+    def "should send email while trying to publish article"() {
+        given:
+            def articleId = "1"
+            def articleEntity = new ArticleEntity()
+            def userAuthentication = new UserAuthentication("2", true)
+            SecurityContextHolder.getContext().setAuthentication(userAuthentication)
+            articleEntity.setId(articleId)
+            articleEntity.setUserId(2)
+            articleEntity.setDraft(true)
+            def memberMails = ["member@gmail.com"]
+            articleRepository.findById(articleId) >> Optional.of(articleEntity)
+            teamClient.getAllMails() >> memberMails
+        when:
+            articleServiceImpl.publishArticle(articleId)
+        then:
+            1 * mailService.sendToQueue(_)
+            notThrown(exception)
+        where:
+            exception << [NoSuchArticleException, UnauthorizedAccessException,
+                          AlreadyPublishedArticleException, MembersNotFoundException]
+    }
+
+    def "should throw UnauthorizedAccessException when not authorized user tries to publish"() {
+        given:
+            def articleId = "1"
+            def articleEntity = new ArticleEntity()
+            def userAuthentication = new UserAuthentication("2", true)
+            SecurityContextHolder.getContext().setAuthentication(userAuthentication)
+            articleEntity.setId(articleId)
+            articleEntity.setUserId(3)
+            articleRepository.findById(articleId) >> Optional.of(articleEntity)
+        when:
+            articleServiceImpl.publishArticle(articleId)
+        then:
+            thrown(UnauthorizedAccessException)
+    }
+
+    def "should throw ArticleNotFoundException when article doesn't exist"() {
+        given:
+            def articleId = "1"
+            def userAuthentication = new UserAuthentication("", true)
+            SecurityContextHolder.getContext().setAuthentication(userAuthentication)
+            articleRepository.findById(articleId) >> Optional.empty()
+        when:
+            articleServiceImpl.publishArticle(articleId)
+        then:
+            thrown(NoSuchArticleException)
+    }
+
+    def "should throw AlreadyPublishedArticleException when article is already published"() {
+        given:
+            def articleId = "1"
+            def articleEntity = new ArticleEntity()
+            def userAuthentication = new UserAuthentication("2", true)
+            SecurityContextHolder.getContext().setAuthentication(userAuthentication)
+            articleEntity.setId(articleId)
+            articleEntity.setUserId(2)
+            articleEntity.setDraft(false)
+            articleRepository.findById(articleId) >> Optional.of(articleEntity)
+        when:
+            articleServiceImpl.publishArticle(articleId)
+        then:
+            thrown(AlreadyPublishedArticleException)
+    }
+
+    def "should throw MembersNotFoundException when retrieving members from ms-team is failed"() {
+        given:
+            def articleId = "1"
+            def articleEntity = new ArticleEntity()
+            def userAuthentication = new UserAuthentication("2", true)
+            SecurityContextHolder.getContext().setAuthentication(userAuthentication)
+            articleEntity.setId(articleId)
+            articleEntity.setUserId(2)
+            articleEntity.setDraft(true)
+            def memberMails = []
+            articleRepository.findById(articleId) >> Optional.of(articleEntity)
+            teamClient.getAllMails() >> memberMails
+        when:
+            articleServiceImpl.publishArticle(articleId)
+        then:
+            thrown(MembersNotFoundException)
     }
 
     def "should use the repository to fetch article by id"() {
@@ -47,24 +136,19 @@ class ArticleServiceTest extends Specification {
             SecurityContextHolder.getContext().setAuthentication(userAuthentication)
             def articleDTO = ArticleMapper.INSTANCE.entityToDto(articleEntity, userDTO)
             articleDTO.setComments(Collections.singletonList(new CommentDTO()))
-
         when:
             def res = articleServiceImpl.getArticleById(articleId)
-
         then: "get article"
             1 * articleRepository.findById(articleId) >> Optional.of(articleEntity)
             1 * msAuthService.getUserById(articleEntity.userId) >> userDTO
-
             res == articleDTO
     }
 
     def "should throw NoSuchArticleException if no such article"() {
         given:
             def articleId = "dasdpksapdksaop"
-
         when:
             articleServiceImpl.getArticleById(articleId)
-
         then:
             1 * articleRepository.findById(articleId) >> Optional.empty()
             thrown(NoSuchArticleException)
@@ -80,10 +164,8 @@ class ArticleServiceTest extends Specification {
                     hateCount: 5, readCount: 75, isDraft: true, isApproved: false, approverId: 41, tags: [tag], comments: [comment])
             def userAuthentication = null
             SecurityContextHolder.getContext().setAuthentication(userAuthentication)
-
         when:
             articleServiceImpl.getArticleById(articleId)
-
         then: "get article"
             1 * articleRepository.findById(articleId) >> Optional.of(articleEntity)
             thrown(UnauthorizedAccessException)
@@ -99,10 +181,8 @@ class ArticleServiceTest extends Specification {
                     hateCount: 5, readCount: 75, isDraft: true, isApproved: false, approverId: 41, tags: [tag], comments: [comment])
             def userAuthentication = new UserAuthentication("15", true)
             SecurityContextHolder.getContext().setAuthentication(userAuthentication)
-
         when:
             articleServiceImpl.getArticleById(articleId)
-
         then:
             1 * articleRepository.findById(articleId) >> Optional.of(articleEntity)
             thrown(UnauthorizedAccessException)
@@ -118,10 +198,8 @@ class ArticleServiceTest extends Specification {
                     hateCount: 5, readCount: 75, isDraft: false, isApproved: true, approverId: 41, tags: [tag], comments: [comment])
             def userAuthentication = new UserAuthentication("41", true)
             SecurityContextHolder.getContext().setAuthentication(userAuthentication)
-
         when:
             articleServiceImpl.deleteArticleById(articleId)
-
         then: "get article"
             1 * articleRepository.findById(articleId) >> Optional.of(articleEntity)
             1 * commentRepository.deleteAll(articleEntity.getComments())
@@ -138,10 +216,8 @@ class ArticleServiceTest extends Specification {
                     hateCount: 5, readCount: 75, isDraft: false, isApproved: true, approverId: 41, tags: [tag], comments: [comment])
             def userAuthentication = new UserAuthentication("10", true)
             SecurityContextHolder.getContext().setAuthentication(userAuthentication)
-
         when:
             articleServiceImpl.deleteArticleById(articleId)
-
         then: "get article"
             1 * articleRepository.findById(articleId) >> Optional.of(articleEntity)
             thrown(UnauthorizedAccessException)
@@ -154,8 +230,6 @@ class ArticleServiceTest extends Specification {
             articleEntity.setId("1")
             articleEntity.setReadCount(12)
             def article = Optional.of(articleEntity)
-
-
         when:
             articleServiceImpl.addReadCount(articleEntity.getId())
 
@@ -164,8 +238,6 @@ class ArticleServiceTest extends Specification {
             1 * msAuthService.addPopularity(articleEntity.getUserId())
             1 * articleRepository.save(articleEntity)
             notThrown(ArticleNotFoundException)
-
-
     }
 
     def "throw ArticleNotFoundException and don't add read count if article is not found"() {
@@ -179,8 +251,5 @@ class ArticleServiceTest extends Specification {
         then:
             1 * articleRepository.findById(articleId) >> articleEntity
             thrown(ArticleNotFoundException)
-
-
     }
-
 }
