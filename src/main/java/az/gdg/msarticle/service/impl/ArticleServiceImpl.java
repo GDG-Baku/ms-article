@@ -1,10 +1,10 @@
 package az.gdg.msarticle.service.impl;
 
 import az.gdg.msarticle.client.TeamClient;
+import az.gdg.msarticle.exception.AlreadyPublishedArticleException;
 import az.gdg.msarticle.exception.ArticleNotFoundException;
 import az.gdg.msarticle.exception.InvalidTokenException;
 import az.gdg.msarticle.exception.MembersNotFoundException;
-import az.gdg.msarticle.exception.AlreadyPublishedArticleException;
 import az.gdg.msarticle.exception.NoSuchArticleException;
 import az.gdg.msarticle.exception.UnauthorizedAccessException;
 import az.gdg.msarticle.mapper.ArticleMapper;
@@ -138,7 +138,7 @@ public class ArticleServiceImpl implements ArticleService {
             if (articleEntity.isDraft()) {
                 memberMails = teamClient.getAllMails();
                 if (memberMails != null && !memberMails.isEmpty()) {
-                    MailUtil.sendMail(articleId, "publish", mailService, memberMails);
+                    sendMail(articleId, "publish", memberMails);
                     logger.info("ServiceLog.publishArticle.success");
                     message = "Article is sent for reviewing";
                 } else {
@@ -151,5 +151,14 @@ public class ArticleServiceImpl implements ArticleService {
         }
         logger.info("ServiceLog.publishArticle.end");
         throw new UnauthorizedAccessException("You don't have permission to publish this article");
+    }
+
+    public void sendMail(String articleId, String requestType,
+                         List<String> receivers) {
+        logger.info("ServiceLog.sendMail.start with articleId {} and requestType: {}", articleId, requestType);
+        String mailBody = String.format("Author that has article with id %s wants to %s it.<br>" +
+                "Please review article before %s", articleId, requestType, requestType);
+        mailService.sendToQueue(MailUtil.buildMail(receivers, mailBody));
+        logger.info("ServiceLog.sendMail.end with articleId {} and requestType: {}", articleId, requestType);
     }
 }
