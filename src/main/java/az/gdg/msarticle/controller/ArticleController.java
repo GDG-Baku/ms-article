@@ -1,9 +1,9 @@
 package az.gdg.msarticle.controller;
 
 import az.gdg.msarticle.model.dto.ArticleDTO;
+import az.gdg.msarticle.model.dto.UserArticleDTO;
 import az.gdg.msarticle.service.ArticleService;
 import io.swagger.annotations.ApiOperation;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -58,10 +58,12 @@ public class ArticleController {
                                                  @PathVariable String articleId) {
         logger.debug("Publish article with article id {} start", articleId);
         return new ResponseEntity<>(articleService.publishArticle(articleId), HttpStatus.OK);
+    }
+
     @GetMapping("/articles/{userId}/{page}")
     public UserArticleDTO getArticlesByUserId(
             @RequestHeader(value = "X-Auth-Token", required = false) String token,
-            @PathVariable("userId") int userId,
+            @PathVariable("userId") Long userId,
             @PathVariable("page") int page) {
         logger.debug("Get articles by userId {} start", userId);
         return articleService.getArticlesByUserId(userId, page);
