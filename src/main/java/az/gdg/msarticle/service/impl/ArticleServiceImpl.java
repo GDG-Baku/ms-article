@@ -11,6 +11,7 @@ import az.gdg.msarticle.mapper.ArticleMapper;
 import az.gdg.msarticle.mapper.CommentMapper;
 import az.gdg.msarticle.model.dto.ArticleDTO;
 import az.gdg.msarticle.model.dto.CommentDTO;
+import az.gdg.msarticle.model.dto.UserArticleDTO;
 import az.gdg.msarticle.model.dto.UserDTO;
 import az.gdg.msarticle.model.entity.ArticleEntity;
 import az.gdg.msarticle.model.entity.CommentEntity;
@@ -21,12 +22,14 @@ import az.gdg.msarticle.service.MailService;
 import az.gdg.msarticle.service.MsAuthService;
 import az.gdg.msarticle.util.AuthUtil;
 import az.gdg.msarticle.util.MailUtil;
-
-import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class ArticleServiceImpl implements ArticleService {
@@ -73,7 +76,10 @@ public class ArticleServiceImpl implements ArticleService {
                 .orElseThrow(() -> new NoSuchArticleException("Article doesn't exist"));
         Long articleUserId = articleEntity.getUserId();
         if (articleUserId.equals(userId)) {
-            deleteAllComments(articleEntity.getComments());
+            if (articleEntity.getComments() != null
+                    && !articleEntity.getComments().isEmpty()) {
+                deleteAllComments(articleEntity.getComments());
+            }
             articleRepository.deleteById(articleID);
         } else {
             logger.info("Thrown.UnauthorizedAccessException");
@@ -97,7 +103,7 @@ public class ArticleServiceImpl implements ArticleService {
         Long userId = articleEntity.getUserId();
         if (articleEntity.isDraft()) {
             try {
-                if (Integer.parseInt(AuthUtil.getAuthenticatedObject().getPrincipal().toString()) != userId) {
+                if (Long.parseLong(AuthUtil.getAuthenticatedObject().getPrincipal().toString()) != userId) {
                     logger.error("Thrown.UnauthorizedAccessException");
                     throw new UnauthorizedAccessException("You don't have permission to get the article");
                 }
@@ -108,7 +114,9 @@ public class ArticleServiceImpl implements ArticleService {
         }
         UserDTO userDTO = msAuthService.getUserById(userId);
         ArticleDTO articleDTO = ArticleMapper.INSTANCE.entityToDto(articleEntity, userDTO);
-        articleDTO.setComments(getCommentDTOsWithUserDTO(articleEntity.getComments()));
+        if (articleEntity.getComments() != null) {
+            articleDTO.setComments(getCommentDTOsWithUserDTO(articleEntity.getComments()));
+        }
         articleDTO.setComments(CommentMapper.INSTANCE.entityToDtoList(articleEntity.getComments()));
 
         logger.info("ServiceLog.getArticleById.end with id {}", articleId);
@@ -161,4 +169,30 @@ public class ArticleServiceImpl implements ArticleService {
         mailService.sendToQueue(MailUtil.buildMail(receivers, mailBody));
         logger.info("ServiceLog.sendMail.end with articleId {} and requestType: {}", articleId, requestType);
     }
+
+    @Override
+    public UserArticleDTO getArticlesByUserId(Long userId, int page) {
+        logger.info("ServiceLog.getArticlesByUserId.start with userId {}", userId);
+        List<ArticleEntity> articleEntities;
+        Pageable pageable = PageRequest.of(page, 5, Sort.by("createdAt").descending());
+        try {
+            if (Integer.parseInt(AuthUtil.getAuthenticatedObject().getPrincipal().toString()) == userId) {
+                articleEntities = articleRepository.getArticleEntitiesByUserId(userId, pageable).getContent();
+            } else {
+                throw new UnauthorizedAccessException("It's not your article");
+            }
+        } catch (InvalidTokenException | UnauthorizedAccessException e) {
+            articleEntities = articleRepository
+                    .getArticleEntitiesByUserIdAndIsDraftFalseAndIsApprovedTrue(userId, pageable).getContent();
+        }
+        List<ArticleDTO> articleDTOs = ArticleMapper.INSTANCE.entityToDtoList(articleEntities);
+        UserDTO userDTO = msAuthService.getUserById(userId);
+
+        logger.info("ServiceLog.getArticlesByUserId.end with userId {}", userId);
+        return UserArticleDTO.builder()
+                .articleDTOs(articleDTOs)
+                .userDTO(userDTO)
+                .build();
+    }
+
 }
