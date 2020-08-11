@@ -76,8 +76,8 @@ public class ArticleServiceImpl implements ArticleService {
                 .orElseThrow(() -> new NoSuchArticleException("Article doesn't exist"));
         Long articleUserId = articleEntity.getUserId();
         if (articleUserId.equals(userId)) {
-            if (articleEntity.getComments() != null ||
-                    articleEntity.getComments().isEmpty()) {
+            if (articleEntity.getComments() != null
+                    && !articleEntity.getComments().isEmpty()) {
                 deleteAllComments(articleEntity.getComments());
             }
             articleRepository.deleteById(articleID);
@@ -114,7 +114,9 @@ public class ArticleServiceImpl implements ArticleService {
         }
         UserDTO userDTO = msAuthService.getUserById(userId);
         ArticleDTO articleDTO = ArticleMapper.INSTANCE.entityToDto(articleEntity, userDTO);
-        articleDTO.setComments(getCommentDTOsWithUserDTO(articleEntity.getComments()));
+        if (articleEntity.getComments() != null) {
+            articleDTO.setComments(getCommentDTOsWithUserDTO(articleEntity.getComments()));
+        }
         articleDTO.setComments(CommentMapper.INSTANCE.entityToDtoList(articleEntity.getComments()));
 
         logger.info("ServiceLog.getArticleById.end with id {}", articleId);
@@ -144,7 +146,6 @@ public class ArticleServiceImpl implements ArticleService {
             if (articleEntity.isDraft()) {
                 memberMails = teamClient.getAllMails();
                 if (memberMails != null && !memberMails.isEmpty()) {
-                    System.out.println("Ok");
                     sendMail(articleId, "publish", memberMails);
                     logger.info("ServiceLog.publishArticle.success");
                     message = "Article is sent for reviewing";
@@ -171,7 +172,7 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     public UserArticleDTO getArticlesByUserId(Long userId, int page) {
-        logger.info("ActionLog.getArticlesByUserId.start with userId {}", userId);
+        logger.info("ServiceLog.getArticlesByUserId.start with userId {}", userId);
         List<ArticleEntity> articleEntities;
         Pageable pageable = PageRequest.of(page, 5, Sort.by("createdAt").descending());
         try {
@@ -187,7 +188,7 @@ public class ArticleServiceImpl implements ArticleService {
         List<ArticleDTO> articleDTOs = ArticleMapper.INSTANCE.entityToDtoList(articleEntities);
         UserDTO userDTO = msAuthService.getUserById(userId);
 
-        logger.info("ActionLog.getArticlesByUserId.end with userId {}", userId);
+        logger.info("ServiceLog.getArticlesByUserId.end with userId {}", userId);
         return UserArticleDTO.builder()
                 .articleDTOs(articleDTOs)
                 .userDTO(userDTO)
