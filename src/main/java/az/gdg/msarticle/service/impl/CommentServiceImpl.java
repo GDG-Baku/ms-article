@@ -80,6 +80,7 @@ public class CommentServiceImpl implements CommentService {
             if (commentEntity.getReplies() != null) {
                 commentRepository.deleteAll(commentEntity.getReplies());
             }
+            deleteCommentReference(commentEntity);
             commentRepository.deleteById(id);
             logger.info("ServiceLog.deleteComment.success with id {}", id);
             message = "Comment is deleted";
@@ -88,5 +89,18 @@ public class CommentServiceImpl implements CommentService {
         }
         logger.info("ServiceLog.deleteComment.end with id {}", id);
         return message;
+    }
+
+    private void deleteCommentReference(CommentEntity comment) {
+        boolean isReply = comment.isReply();
+        if (isReply) {
+            CommentEntity commentEntity = commentRepository.findByRepliesContains(comment);
+            commentEntity.getReplies().removeIf(c -> c.getId().equals(comment.getId()));
+            commentRepository.save(commentEntity);
+        } else {
+            ArticleEntity articleEntity = articleRepository.findByCommentsContains(comment);
+            articleEntity.getComments().removeIf(entity -> entity.getId().equals(comment.getId()));
+            articleRepository.save(articleEntity);
+        }
     }
 }

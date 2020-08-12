@@ -34,7 +34,11 @@ class CommentServiceImplTest extends Specification {
             SecurityContextHolder.getContext().setAuthentication(userAuthentication)
             def commentEntity = new CommentEntity()
             commentEntity.setUserId(2)
+            commentEntity.setReply(true)
+            def parentComment = new CommentEntity()
+            parentComment.setReplies(Collections.emptyList())
             commentRepository.findById(commentId) >> Optional.of(commentEntity)
+            commentRepository.findByRepliesContains(commentEntity) >> parentComment
         when:
             commentService.deleteComment(commentId)
         then:
@@ -52,7 +56,11 @@ class CommentServiceImplTest extends Specification {
             def commentEntity = new CommentEntity()
             commentEntity.setUserId(2)
             commentEntity.setReplies(Collections.singletonList("") as List<CommentEntity>)
+            commentEntity.setReply(false)
+            def referencedArticle = new ArticleEntity();
+            referencedArticle.setComments(Collections.emptyList())
             commentRepository.findById(commentId) >> Optional.of(commentEntity)
+            articleRepository.findByCommentsContains(commentEntity) >> referencedArticle
         when:
             commentService.deleteComment(commentId)
         then:
