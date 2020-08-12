@@ -13,5 +13,5 @@ public class CommentRequest {
 
     private String articleId;
     private String text;
-    private Integer parentCommentId;
+    private String parentCommentId;
 }

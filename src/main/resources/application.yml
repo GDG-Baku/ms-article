@@ -1,5 +1,6 @@
 server:
   port: 8080
+
 logging:
   level:
     org:
@@ -10,11 +11,19 @@ spring:
     mongodb:
       uri: ${MONGODB_URI}
 
+  rabbitmq:
+    addresses: ${SPRING_RABBITMQ_ADDRESSES}
+  cloud:
+    stream:
+      bindings:
+        output:
+          destination: mail
+          group: mail-group
+
 swagger:
   enabled: true
 
-service:
-  url:
-    ms-auth: ${SERVICE_URL_MS-AUTH}
-
-
+client:
+  service:
+    url:
+      ms-auth: ${CLIENT_SERVICE_URL_MS-AUTH}

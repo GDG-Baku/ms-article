@@ -3,6 +3,10 @@ package az.gdg.msarticle.mapper;
 import az.gdg.msarticle.exception.InvalidTypeException;
 import az.gdg.msarticle.model.ArticleRequest;
 import az.gdg.msarticle.model.TypeEnum;
+import az.gdg.msarticle.exception.TypeNotFoundException;
+import az.gdg.msarticle.model.TypeEnum;
+import az.gdg.msarticle.model.dto.ArticleDTO;
+import az.gdg.msarticle.model.dto.UserDTO;
 import az.gdg.msarticle.model.entity.ArticleEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -27,4 +31,22 @@ public interface ArticleMapper {
     @Mapping(source = "type", target = "type", qualifiedByName = "getValueOfType")
     ArticleEntity requestToEntity(ArticleRequest articleRequest);
 
+    @Named("getTypeOfValue")
+    static String getTypeOfValue(Integer type) {
+        for (TypeEnum typeEnum : TypeEnum.values()) {
+            if (typeEnum.getValue() == type) {
+                return typeEnum.name();
+            }
+        }
+        throw new TypeNotFoundException("Please, specify valid type");
+    }
+
+    ArticleEntity dtoToEntity(ArticleDTO articleDTO);
+
+    List<ArticleDTO> entityToDtoList(List<ArticleEntity> articleEntities);
+
+    @Mapping(target = "comments", ignore = true)
+    @Mapping(source = "articleEntity.type", target = "type", qualifiedByName = "getTypeOfValue")
+    @Mapping(source = "userDTO", target = "userDTO")
+    ArticleDTO entityToDto(ArticleEntity articleEntity, UserDTO userDTO);
 }

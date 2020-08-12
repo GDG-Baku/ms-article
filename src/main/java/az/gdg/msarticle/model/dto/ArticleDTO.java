@@ -9,23 +9,20 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class ArticleDTO {
-
     private String id;
-    private String userId;
-    private String firstName;
-    private String lastName;
-    private String imageUrl;
+    private UserDTO userDTO;
+    private String type;
+    private Integer userId;
     private String title;
     private String content;
-    private LocalDateTime createdAt;
     private Integer quackCount;
-    private Integer hateCount;
     private Integer readCount;
-    private String type;
+    private Integer hateCount;
+    private LocalDateTime createdAt;
     private boolean isDraft;
     private List<TagDTO> tags;
     private List<CommentDTO> comments;

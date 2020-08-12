@@ -25,10 +25,8 @@ public class ArticleEntity {
     private String title;
     private String content;
     private Integer type;
-
     @CreatedDate
     private LocalDateTime createdAt;
-
     @LastModifiedDate
     private LocalDateTime updatedAt;
     private Integer quackCount;
@@ -39,7 +37,6 @@ public class ArticleEntity {
     private Integer approverId;
     @DBRef
     private List<TagEntity> tags;
-
     @DBRef
     private List<CommentEntity> comments;
 }
