@@ -1,46 +1,71 @@
 package az.gdg.msarticle.service.impl;
 
+import az.gdg.msarticle.client.TeamClient;
+import az.gdg.msarticle.exception.AlreadyPublishedArticleException;
+import az.gdg.msarticle.exception.ArticleNotFoundException;
 import az.gdg.msarticle.exception.InvalidTokenException;
+import az.gdg.msarticle.exception.MembersNotFoundException;
+import az.gdg.msarticle.exception.NoSuchArticleException;
+import az.gdg.msarticle.exception.UnauthorizedAccessException;
 import az.gdg.msarticle.mapper.ArticleMapper;
+import az.gdg.msarticle.mapper.CommentMapper;
 import az.gdg.msarticle.model.ArticleRequest;
+import az.gdg.msarticle.model.dto.ArticleDTO;
+import az.gdg.msarticle.model.dto.CommentDTO;
+import az.gdg.msarticle.model.dto.UserArticleDTO;
+import az.gdg.msarticle.model.dto.UserDTO;
 import az.gdg.msarticle.model.entity.ArticleEntity;
+import az.gdg.msarticle.model.entity.CommentEntity;
 import az.gdg.msarticle.repository.ArticleRepository;
+import az.gdg.msarticle.repository.CommentRepository;
 import az.gdg.msarticle.service.ArticleService;
+import az.gdg.msarticle.service.MailService;
+import az.gdg.msarticle.service.MsAuthService;
 import az.gdg.msarticle.service.TagService;
+import az.gdg.msarticle.util.AuthUtil;
+import az.gdg.msarticle.util.MailUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
+import java.util.List;
 
 @Service
 public class ArticleServiceImpl implements ArticleService {
-
     private static final Logger logger = LoggerFactory.getLogger(ArticleServiceImpl.class);
     private final ArticleRepository articleRepository;
+    private final MsAuthService msAuthService;
+    private final CommentRepository commentRepository;
+    private final MailService mailService;
+    private final TeamClient teamClient;
     private final TagService tagService;
 
-    public ArticleServiceImpl(ArticleRepository articleRepository, TagService tagService) {
+    public ArticleServiceImpl(ArticleRepository articleRepository,
+                              MsAuthService msAuthService,
+                              CommentRepository commentRepository,
+                              MailService mailService,
+                              TeamClient teamClient,
+                              TagService tagService) {
         this.articleRepository = articleRepository;
+        this.msAuthService = msAuthService;
+        this.commentRepository = commentRepository;
+        this.mailService = mailService;
+        this.teamClient = teamClient;
         this.tagService = tagService;
     }
 
-    private Authentication getAuthenticatedObject() {
-        if (SecurityContextHolder.getContext().getAuthentication() == null) {
-            throw new InvalidTokenException("Token is not valid or it is expired");
-        }
-        return SecurityContextHolder.getContext().getAuthentication();
-    }
 
     @Override
     public String addDraft(String token, ArticleRequest articleRequest) {
-        logger.info("ActionLog.addDraft.start");
-        String userId = (String) getAuthenticatedObject().getPrincipal();
+        logger.info("ServiceLog.addDraft.start");
+        Long userId = Long.parseLong((String) AuthUtil.getAuthenticatedObject().getPrincipal());
 
         ArticleEntity draft = ArticleMapper.INSTANCE.requestToEntity(articleRequest);
-        draft.setUserId(Long.parseLong(userId));
+        draft.setUserId(userId);
         draft.setDraft(true);
         draft.setReadCount(0);
         draft.setHateCount(0);
@@ -57,64 +82,12 @@ public class ArticleServiceImpl implements ArticleService {
 
         articleRepository.save(draft);
 
-        logger.info("ActionLog.addDraft.stop.success");
+        logger.info("ServiceLog.addDraft.stop.success");
 
         return draft.getId();
 
 
     }
-import az.gdg.msarticle.client.TeamClient;
-import az.gdg.msarticle.exception.AlreadyPublishedArticleException;
-import az.gdg.msarticle.exception.ArticleNotFoundException;
-import az.gdg.msarticle.exception.InvalidTokenException;
-import az.gdg.msarticle.exception.MembersNotFoundException;
-import az.gdg.msarticle.exception.NoSuchArticleException;
-import az.gdg.msarticle.exception.UnauthorizedAccessException;
-import az.gdg.msarticle.mapper.ArticleMapper;
-import az.gdg.msarticle.mapper.CommentMapper;
-import az.gdg.msarticle.model.dto.ArticleDTO;
-import az.gdg.msarticle.model.dto.CommentDTO;
-import az.gdg.msarticle.model.dto.UserArticleDTO;
-import az.gdg.msarticle.model.dto.UserDTO;
-import az.gdg.msarticle.model.entity.ArticleEntity;
-import az.gdg.msarticle.model.entity.CommentEntity;
-import az.gdg.msarticle.repository.ArticleRepository;
-import az.gdg.msarticle.repository.CommentRepository;
-import az.gdg.msarticle.service.ArticleService;
-import az.gdg.msarticle.service.MailService;
-import az.gdg.msarticle.service.MsAuthService;
-import az.gdg.msarticle.util.AuthUtil;
-import az.gdg.msarticle.util.MailUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
-
-@Service
-public class ArticleServiceImpl implements ArticleService {
-    private static final Logger logger = LoggerFactory.getLogger(ArticleServiceImpl.class);
-    private final ArticleRepository articleRepository;
-    private final MsAuthService msAuthService;
-    private final CommentRepository commentRepository;
-    private final MailService mailService;
-    private final TeamClient teamClient;
-
-    public ArticleServiceImpl(ArticleRepository articleRepository,
-                              MsAuthService msAuthService,
-                              CommentRepository commentRepository,
-                              MailService mailService,
-                              TeamClient teamClient) {
-        this.articleRepository = articleRepository;
-        this.msAuthService = msAuthService;
-        this.commentRepository = commentRepository;
-        this.mailService = mailService;
-        this.teamClient = teamClient;
-    }
-
 
     @Override
     public void addReadCount(String articleId) {
@@ -139,8 +112,8 @@ public class ArticleServiceImpl implements ArticleService {
                 .orElseThrow(() -> new NoSuchArticleException("Article doesn't exist"));
         Long articleUserId = articleEntity.getUserId();
         if (articleUserId.equals(userId)) {
-            if (articleEntity.getComments() != null
-                    && !articleEntity.getComments().isEmpty()) {
+            if (articleEntity.getComments() != null  &&
+                    !articleEntity.getComments().isEmpty()) {
                 deleteAllComments(articleEntity.getComments());
             }
             articleRepository.deleteById(articleID);

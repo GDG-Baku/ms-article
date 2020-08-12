@@ -1,5 +1,6 @@
 package az.gdg.msarticle.service;
 
+import az.gdg.msarticle.model.ArticleRequest;
 import az.gdg.msarticle.model.dto.ArticleDTO;
 import az.gdg.msarticle.model.dto.UserArticleDTO;
 

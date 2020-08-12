@@ -1,26 +1,45 @@
 package az.gdg.msarticle.service.impl
 
-import az.gdg.msarticle.exception.InvalidTokenException
+import az.gdg.msarticle.client.TeamClient
+import az.gdg.msarticle.exception.*
 import az.gdg.msarticle.mapper.ArticleMapper
 import az.gdg.msarticle.model.ArticleRequest
+import az.gdg.msarticle.model.dto.CommentDTO
+import az.gdg.msarticle.model.dto.UserDTO
+import az.gdg.msarticle.model.entity.ArticleEntity
+import az.gdg.msarticle.model.entity.CommentEntity
+import az.gdg.msarticle.model.entity.TagEntity
 import az.gdg.msarticle.repository.ArticleRepository
+import az.gdg.msarticle.repository.CommentRepository
 import az.gdg.msarticle.security.UserAuthentication
-import az.gdg.msarticle.service.TagService
+import az.gdg.msarticle.service.MsAuthService
+import org.springframework.data.domain.PageImpl
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Sort
 import org.springframework.security.core.context.SecurityContextHolder
 import spock.lang.Specification
-import spock.lang.Title
 
-@Title("Testing for article service implementation")
+import java.time.LocalDateTime
+
 class ArticleServiceImplTest extends Specification {
 
-    private ArticleRepository articleRepository
-    private TagService tagService
-    private ArticleServiceImpl articleService
+    private def articleRepository
+    private def mailService
+    private def articleServiceImpl
+    private MsAuthService msAuthService
+    private CommentRepository commentRepository
+    private def teamClient
+    private def tagService
 
-    def setup() {
-        articleRepository = Mock()
-        tagService = Mock()
-        articleService = new ArticleServiceImpl(articleRepository, tagService)
+    void setup() {
+        articleRepository = Mock(ArticleRepository)
+        mailService = Mock(MailServiceImpl)
+        msAuthService = Mock()
+        commentRepository = Mock()
+        teamClient = Mock(TeamClient)
+        tagService = Mock(TagServiceImpl)
+        articleServiceImpl = new ArticleServiceImpl(articleRepository, msAuthService, commentRepository,
+                mailService, teamClient, tagService)
     }
 
     def "set empty list if draft is news"() {
@@ -42,83 +61,12 @@ class ArticleServiceImplTest extends Specification {
             SecurityContextHolder.getContext().setAuthentication(userAuthentication)
 
         when:
-            articleService.addDraft(token, articleRequest)
+            articleServiceImpl.addDraft(token, articleRequest)
 
         then:
             1 * articleRepository.save(draft)
 
 
-    }
-
-
-    def "should throw InvalidTokenException if token is invalid"() {
-        given:
-            def userAuthentication = null
-            SecurityContextHolder.getContext().setAuthentication(userAuthentication)
-
-        when:
-            articleService.getAuthenticatedObject()
-
-        then:
-            thrown(InvalidTokenException)
-
-
-    }
-
-    def "get authenticated object if token is valid"() {
-        given:
-            def userAuthentication = new UserAuthentication("1", true)
-            SecurityContextHolder.getContext().setAuthentication(userAuthentication)
-
-        when:
-            articleService.getAuthenticatedObject()
-
-        then:
-            SecurityContextHolder.getContext().getAuthentication() == userAuthentication
-            notThrown(InvalidTokenException)
-
-
-    }
-
-
-import az.gdg.msarticle.client.TeamClient
-import az.gdg.msarticle.exception.ArticleNotFoundException
-import az.gdg.msarticle.exception.MembersNotFoundException
-import az.gdg.msarticle.exception.AlreadyPublishedArticleException
-import az.gdg.msarticle.exception.NoSuchArticleException
-import az.gdg.msarticle.exception.UnauthorizedAccessException
-import az.gdg.msarticle.mapper.ArticleMapper
-import az.gdg.msarticle.model.dto.CommentDTO
-import az.gdg.msarticle.model.dto.UserDTO
-import az.gdg.msarticle.model.entity.ArticleEntity
-import az.gdg.msarticle.model.entity.CommentEntity
-import az.gdg.msarticle.model.entity.TagEntity
-import az.gdg.msarticle.repository.ArticleRepository
-import az.gdg.msarticle.repository.CommentRepository
-import az.gdg.msarticle.security.UserAuthentication
-import az.gdg.msarticle.service.MsAuthService
-import org.springframework.security.core.context.SecurityContextHolder
-import spock.lang.Specification
-
-import java.time.LocalDateTime
-
-class ArticleServiceImplTest extends Specification {
-
-    private def articleRepository
-    private def mailService
-    private def articleServiceImpl
-    private MsAuthService msAuthService
-    private CommentRepository commentRepository
-    private def teamClient
-
-    void setup() {
-        articleRepository = Mock(ArticleRepository)
-        mailService = Mock(MailServiceImpl)
-        msAuthService = Mock()
-        commentRepository = Mock()
-        teamClient = Mock(TeamClient)
-        articleServiceImpl = new ArticleServiceImpl(articleRepository, msAuthService, commentRepository,
-                mailService, teamClient)
     }
 
     def "should send email while trying to publish article"() {
@@ -332,5 +280,98 @@ class ArticleServiceImplTest extends Specification {
         then:
             1 * articleRepository.findById(articleId) >> articleEntity
             thrown(ArticleNotFoundException)
+    }
+
+    def "should use the repository to fetch all articles by UserId if it's own account"() {
+        given:
+            def userId = 41
+            def page = 0
+            def articleEntity1 = ArticleEntity.builder()
+                    .userId(userId)
+                    .type(1)
+                    .isApproved(false)
+                    .isDraft(true)
+                    .build()
+            def articleEntity2 = ArticleEntity.builder()
+                    .userId(userId)
+                    .type(1)
+                    .isApproved(true)
+                    .isDraft(false)
+                    .build()
+            def userDTO = new UserDTO()
+            def articles = Arrays.asList(articleEntity1, articleEntity2)
+            def pageable = PageRequest.of(page, 5, Sort.by("createdAt").descending())
+            def pageArticles = new PageImpl<ArticleEntity>(articles, pageable, articles.size())
+            def articleDTOs = ArticleMapper.INSTANCE.entityToDtoList(articles)
+            def userAuthentication = new UserAuthentication("41", true)
+            SecurityContextHolder.getContext().setAuthentication(userAuthentication)
+
+        when:
+            def res = articleServiceImpl.getArticlesByUserId(userId, page)
+
+        then:
+            1 * articleRepository.getArticleEntitiesByUserId(userId, pageable) >> pageArticles
+            1 * msAuthService.getUserById(userId) >> userDTO
+
+            res.articleDTOs == articleDTOs
+            res.userDTO == userDTO
+    }
+
+    def "should use the repository to fetch non-draft and approved articles by UserId if it's not own account"() {
+        given:
+            def userId = 41
+            def page = 0
+            def articleEntity = ArticleEntity.builder()
+                    .userId(userId)
+                    .type(1)
+                    .isApproved(false)
+                    .isDraft(true)
+                    .build()
+            def userDTO = new UserDTO()
+            def articles = Arrays.asList(articleEntity)
+            def pageable = PageRequest.of(page, 5, Sort.by("createdAt").descending())
+            def pageArticles = new PageImpl<ArticleEntity>(articles, pageable, articles.size())
+            def articleDTOs = ArticleMapper.INSTANCE.entityToDtoList(articles)
+            def userAuthentication = new UserAuthentication("10", true)
+            SecurityContextHolder.getContext().setAuthentication(userAuthentication)
+
+        when:
+            def res = articleServiceImpl.getArticlesByUserId(userId, page)
+
+        then:
+            1 * articleRepository.getArticleEntitiesByUserIdAndIsDraftFalseAndIsApprovedTrue(userId, pageable) >> pageArticles
+            1 * msAuthService.getUserById(userId) >> userDTO
+
+            res.articleDTOs == articleDTOs
+            res.userDTO == userDTO
+    }
+
+    def "should use the repository to fetch non-draft and approved articles by UserId if not logged"() {
+        given:
+            def userId = 41
+            def page = 0
+            def articleEntity = ArticleEntity.builder()
+                    .userId(userId)
+                    .type(1)
+                    .isApproved(false)
+                    .isDraft(true)
+                    .build()
+            def userDTO = new UserDTO()
+            def articles = Arrays.asList(articleEntity)
+            def pageable = PageRequest.of(page, 5, Sort.by("createdAt").descending())
+            def pageArticles = new PageImpl<ArticleEntity>(articles, pageable, articles.size())
+            def articleDTOs = ArticleMapper.INSTANCE.entityToDtoList(articles)
+            def userAuthentication = null
+            SecurityContextHolder.getContext().setAuthentication(userAuthentication)
+
+        when:
+            def res = articleServiceImpl.getArticlesByUserId(userId, page)
+
+        then:
+            1 * articleRepository.getArticleEntitiesByUserIdAndIsDraftFalseAndIsApprovedTrue(userId, pageable) >> pageArticles
+            1 * msAuthService.getUserById(userId) >> userDTO
+
+            res.articleDTOs == articleDTOs
+            res.userDTO == userDTO
     }
 }

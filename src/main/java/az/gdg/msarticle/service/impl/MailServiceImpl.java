@@ -2,7 +2,6 @@ package az.gdg.msarticle.service.impl;
 
 import az.gdg.msarticle.model.client.mail.MailDTO;
 import az.gdg.msarticle.service.MailService;
-
 import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.cloud.stream.messaging.Source;
 import org.springframework.messaging.support.MessageBuilder;

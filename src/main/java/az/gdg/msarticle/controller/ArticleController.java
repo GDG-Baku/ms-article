@@ -1,18 +1,12 @@
 package az.gdg.msarticle.controller;
 
 import az.gdg.msarticle.model.ArticleRequest;
+import az.gdg.msarticle.model.dto.ArticleDTO;
+import az.gdg.msarticle.model.dto.UserArticleDTO;
 import az.gdg.msarticle.service.ArticleService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import az.gdg.msarticle.model.dto.ArticleDTO;
-import az.gdg.msarticle.model.dto.UserArticleDTO;
-import az.gdg.msarticle.service.ArticleService;
-import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -45,6 +39,7 @@ public class ArticleController {
 
         logger.debug("addDraft start");
         return articleService.addDraft(token, articleRequest);
+    }
 
     @GetMapping("/{articleId}")
     public ArticleDTO getArticleById(@RequestHeader(value = "X-Auth-Token", required = false) String token,

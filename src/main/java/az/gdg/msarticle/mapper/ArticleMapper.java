@@ -1,9 +1,8 @@
 package az.gdg.msarticle.mapper;
 
 import az.gdg.msarticle.exception.InvalidTypeException;
-import az.gdg.msarticle.model.ArticleRequest;
-import az.gdg.msarticle.model.TypeEnum;
 import az.gdg.msarticle.exception.TypeNotFoundException;
+import az.gdg.msarticle.model.ArticleRequest;
 import az.gdg.msarticle.model.TypeEnum;
 import az.gdg.msarticle.model.dto.ArticleDTO;
 import az.gdg.msarticle.model.dto.UserDTO;
@@ -13,6 +12,8 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.mapstruct.ReportingPolicy;
 import org.mapstruct.factory.Mappers;
+
+import java.util.List;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface ArticleMapper {
@@ -28,9 +29,6 @@ public interface ArticleMapper {
         throw new InvalidTypeException("Please, specify valid type");
     }
 
-    @Mapping(source = "type", target = "type", qualifiedByName = "getValueOfType")
-    ArticleEntity requestToEntity(ArticleRequest articleRequest);
-
     @Named("getTypeOfValue")
     static String getTypeOfValue(Integer type) {
         for (TypeEnum typeEnum : TypeEnum.values()) {
@@ -40,6 +38,9 @@ public interface ArticleMapper {
         }
         throw new TypeNotFoundException("Please, specify valid type");
     }
+
+    @Mapping(source = "type", target = "type", qualifiedByName = "getValueOfType")
+    ArticleEntity requestToEntity(ArticleRequest articleRequest);
 
     ArticleEntity dtoToEntity(ArticleDTO articleDTO);
 
