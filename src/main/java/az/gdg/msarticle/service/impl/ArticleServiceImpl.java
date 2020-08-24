@@ -3,6 +3,7 @@ package az.gdg.msarticle.service.impl;
 import az.gdg.msarticle.client.TeamClient;
 import az.gdg.msarticle.exception.AlreadyPublishedArticleException;
 import az.gdg.msarticle.exception.ArticleNotFoundException;
+import az.gdg.msarticle.exception.ExceedLimitException;
 import az.gdg.msarticle.exception.InvalidTokenException;
 import az.gdg.msarticle.exception.MembersNotFoundException;
 import az.gdg.msarticle.exception.NoSuchArticleException;
@@ -24,14 +25,15 @@ import az.gdg.msarticle.service.MsAuthService;
 import az.gdg.msarticle.service.TagService;
 import az.gdg.msarticle.util.AuthUtil;
 import az.gdg.msarticle.util.MailUtil;
-import java.util.Collections;
-import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+
+import java.util.Collections;
+import java.util.List;
 
 @Service
 public class ArticleServiceImpl implements ArticleService {
@@ -229,14 +231,16 @@ public class ArticleServiceImpl implements ArticleService {
                 .articleDTOs(articleDTOs)
                 .userDTO(userDTO)
                 .build();
+    }
+
     public void addQuackByArticleId(String articleID, String token) {
         logger.info("ActionLog.addQuackByArticleId.start");
-        Long userId = Long.parseLong((String) getAuthenticatedObject().getPrincipal());
+        Long userId = Long.parseLong((String) AuthUtil.getAuthenticatedObject().getPrincipal());
         ArticleEntity articleEntity = articleRepository.findById(articleID)
                 .orElseThrow(() -> new NoSuchArticleException("Article doesn't exist"));
         Long articleUserId = articleEntity.getUserId();
         Integer remainingQuackCount = msAuthService.getRemainingQuackCount(token);
-        if (!articleUserId.equals(userId) && getAuthenticatedObject().isAuthenticated()) {
+        if (!articleUserId.equals(userId) && AuthUtil.getAuthenticatedObject().isAuthenticated()) {
             if (remainingQuackCount > 0) {
                 articleEntity.setQuackCount(articleEntity.getQuackCount() + 1);
                 articleRepository.save(articleEntity);
@@ -249,14 +253,6 @@ public class ArticleServiceImpl implements ArticleService {
             logger.error("Thrown.UnauthorizedAccessException");
             throw new UnauthorizedAccessException("You don't have access to quack");
         }
-    }
-
-    private Authentication getAuthenticatedObject() {
-        if (SecurityContextHolder.getContext().getAuthentication() == null) {
-            logger.info("Thrown.NotValidTokenException");
-            throw new NotValidTokenException("Token is not valid or it is expired");
-        }
-        return SecurityContextHolder.getContext().getAuthentication();
     }
 
 }

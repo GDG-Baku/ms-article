@@ -363,15 +363,97 @@ class ArticleServiceImplTest extends Specification {
         def articleDTOs = ArticleMapper.INSTANCE.entityToDtoList(articles)
         def userAuthentication = null
         SecurityContextHolder.getContext().setAuthentication(userAuthentication)
-
+    
         when:
-        def res = articleServiceImpl.getArticlesByUserId(userId, page)
-
+            def res = articleServiceImpl.getArticlesByUserId(userId, page)
+    
         then:
-        1 * articleRepository.getArticleEntitiesByUserIdAndIsDraftFalseAndIsApprovedTrue(userId, pageable) >> pageArticles
-        1 * msAuthService.getUserById(userId) >> userDTO
-
-        res.articleDTOs == articleDTOs
-        res.userDTO == userDTO
+            1 * articleRepository.getArticleEntitiesByUserIdAndIsDraftFalseAndIsApprovedTrue(userId, pageable) >> pageArticles
+            1 * msAuthService.getUserById(userId) >> userDTO
+        
+            res.articleDTOs == articleDTOs
+            res.userDTO == userDTO
+    }
+    
+    def "should use the repository to add article quackCount by id"() {
+        given:
+            def articleId = "5eac708be7179a42f172de4c"
+            def token = "wdasadadada"
+            def tag = new TagEntity()
+            def comment = new CommentEntity()
+            def remainingQuackCount = 500
+            def articleEntity = new ArticleEntity(id: "5eac708be7179a42f172de4c", userId: 41, title: "Test Title",
+                    content: "Code Block", createdAt: LocalDateTime.now(), updatedAt: LocalDateTime.now(), quackCount: 30,
+                    hateCount: 5, readCount: 75, isDraft: false, isApproved: true, approverId: 41, tags: [tag], comments: [comment])
+            def userAuthentication = new UserAuthentication("15", true)
+            SecurityContextHolder.getContext().setAuthentication(userAuthentication)
+        
+        when:
+            articleServiceImpl.addQuackByArticleId(articleId, token)
+        
+        then:
+            1 * articleRepository.findById(articleId) >> Optional.of(articleEntity)
+            1 * msAuthService.getRemainingQuackCount(token) >> remainingQuackCount
+            1 * articleRepository.save(articleEntity)
+            1 * msAuthService.updateRemainingQuackCount(token)
+            articleEntity.quackCount == 31
+    }
+    
+    def "should throw InvalidTokenException if not logged"() {
+        given:
+            def articleId = "5eac708be7179a42f172de4c"
+            def token = "wdasadadada"
+            def userAuthentication = null
+            SecurityContextHolder.getContext().setAuthentication(userAuthentication)
+        
+        when:
+            articleServiceImpl.addQuackByArticleId(articleId, token)
+        
+        then:
+            thrown(InvalidTokenException)
+    }
+    
+    def "should throw UnauthorizedAccessException if it's own article"() {
+        given:
+            def articleId = "5eac708be7179a42f172de4c"
+            def token = "wdasadadada"
+            def tag = new TagEntity()
+            def comment = new CommentEntity()
+            def remainingQuackCount = 500
+            def articleEntity = new ArticleEntity(id: "5eac708be7179a42f172de4c", userId: 41, title: "Test Title",
+                    content: "Code Block", createdAt: LocalDateTime.now(), updatedAt: LocalDateTime.now(), quackCount: 30,
+                    hateCount: 5, readCount: 75, isDraft: false, isApproved: true, approverId: 41, tags: [tag], comments: [comment])
+            def userAuthentication = new UserAuthentication("41", true)
+            SecurityContextHolder.getContext().setAuthentication(userAuthentication)
+        
+        when:
+            articleServiceImpl.addQuackByArticleId(articleId, token)
+        
+        then:
+            1 * articleRepository.findById(articleId) >> Optional.of(articleEntity)
+            1 * msAuthService.getRemainingQuackCount(token) >> remainingQuackCount
+            thrown(UnauthorizedAccessException)
+    }
+    
+    def "should throw ExceedLimitException if all quacks were used"() {
+        given:
+            def articleId = "5eac708be7179a42f172de4c"
+            def token = "wdasadadada"
+            def tag = new TagEntity()
+            def comment = new CommentEntity()
+            def remainingQuackCount = 0
+            def articleEntity = new ArticleEntity(id: "5eac708be7179a42f172de4c", userId: 41, title: "Test Title",
+                    content: "Code Block", createdAt: LocalDateTime.now(), updatedAt: LocalDateTime.now(), quackCount: 30,
+                    hateCount: 5, readCount: 75, isDraft: false, isApproved: true, approverId: 41, tags: [tag], comments: [comment])
+            def userAuthentication = new UserAuthentication("10", true)
+            SecurityContextHolder.getContext().setAuthentication(userAuthentication)
+        
+        when:
+            articleServiceImpl.addQuackByArticleId(articleId, token)
+        
+        then:
+            1 * articleRepository.findById(articleId) >> Optional.of(articleEntity)
+            1 * msAuthService.getRemainingQuackCount(token) >> remainingQuackCount
+            thrown(ExceedLimitException)
     }
 }
