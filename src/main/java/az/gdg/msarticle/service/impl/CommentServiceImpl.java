@@ -12,11 +12,10 @@ import az.gdg.msarticle.repository.ArticleRepository;
 import az.gdg.msarticle.repository.CommentRepository;
 import az.gdg.msarticle.service.CommentService;
 import az.gdg.msarticle.util.AuthUtil;
+import java.util.Collections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-
-import java.util.Collections;
 
 @Service
 public class CommentServiceImpl implements CommentService {

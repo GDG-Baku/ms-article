@@ -20,24 +20,24 @@ class TagServiceImplTest extends Specification {
 
     def "should return tag if doesn't exist in database save also"() {
         given:
-            def tagEntity = new TagEntity()
-            def tagRequest = new TagRequest()
-            tagRequest.setName("")
-            tagRepository.findByName(tagRequest.getName()) >> tagEntity
+        def tagEntity = new TagEntity()
+        def tagRequest = new TagRequest()
+        tagRequest.setName("")
+        tagRepository.findByName(tagRequest.getName()) >> tagEntity
         when:
-            tagService.saveIfNotExist(tagRequest)
+        tagService.saveIfNotExist(tagRequest)
         then:
-            0 * tagRepository.save(_)
+        0 * tagRepository.save(_)
     }
 
     def "return tag if exist in database"() {
         given:
-            def tagRequest = new TagRequest()
-            tagRequest.setName("")
-            tagRepository.findByName(tagRequest.getName()) >> null
+        def tagRequest = new TagRequest()
+        tagRequest.setName("")
+        tagRepository.findByName(tagRequest.getName()) >> null
         when:
-            tagService.saveIfNotExist(tagRequest)
+        tagService.saveIfNotExist(tagRequest)
         then:
-            1 * tagRepository.save(_)
+        1 * tagRepository.save(_)
     }
 }

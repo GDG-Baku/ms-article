@@ -24,15 +24,14 @@ import az.gdg.msarticle.service.MsAuthService;
 import az.gdg.msarticle.service.TagService;
 import az.gdg.msarticle.util.AuthUtil;
 import az.gdg.msarticle.util.MailUtil;
+import java.util.Collections;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-
-import java.util.Collections;
-import java.util.List;
 
 @Service
 public class ArticleServiceImpl implements ArticleService {
@@ -112,7 +111,7 @@ public class ArticleServiceImpl implements ArticleService {
                 .orElseThrow(() -> new NoSuchArticleException("Article doesn't exist"));
         Long articleUserId = articleEntity.getUserId();
         if (articleUserId.equals(userId)) {
-            if (articleEntity.getComments() != null  &&
+            if (articleEntity.getComments() != null &&
                     !articleEntity.getComments().isEmpty()) {
                 deleteAllComments(articleEntity.getComments());
             }

@@ -5,12 +5,11 @@ import az.gdg.msarticle.model.TagRequest;
 import az.gdg.msarticle.model.entity.TagEntity;
 import az.gdg.msarticle.repository.TagRepository;
 import az.gdg.msarticle.service.TagService;
+import java.util.ArrayList;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
 public class TagServiceImpl implements TagService {
