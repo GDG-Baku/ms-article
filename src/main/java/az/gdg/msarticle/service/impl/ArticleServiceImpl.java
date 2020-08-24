@@ -234,7 +234,7 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     public void addQuackByArticleId(String articleID, String token) {
-        logger.info("ActionLog.addQuackByArticleId.start");
+        logger.info("ServiceLog.addQuackByArticleId.start");
         Long userId = Long.parseLong((String) AuthUtil.getAuthenticatedObject().getPrincipal());
         ArticleEntity articleEntity = articleRepository.findById(articleID)
                 .orElseThrow(() -> new NoSuchArticleException("Article doesn't exist"));
