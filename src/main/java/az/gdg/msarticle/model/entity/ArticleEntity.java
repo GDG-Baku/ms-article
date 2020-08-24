@@ -1,5 +1,7 @@
 package az.gdg.msarticle.model.entity;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,22 +12,18 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
-
 @Data
-@Builder
-@AllArgsConstructor
 @NoArgsConstructor
-@Document(collection = "article")
+@AllArgsConstructor
+@Builder
+@Document(collection = "articles")
 public class ArticleEntity {
     @Id
     private String id;
-    private Integer type;
     private Long userId;
     private String title;
     private String content;
+    private Integer type;
     @CreatedDate
     private LocalDateTime createdAt;
     @LastModifiedDate

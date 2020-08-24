@@ -1,16 +1,14 @@
-package az.gdg.msarticle.model.client.auth;
+package az.gdg.msarticle.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class UserInfo {
-    private String userId;
-    private String role;
-    private String mail;
+@Data
+public class TagRequest {
+    private String name;
 }
