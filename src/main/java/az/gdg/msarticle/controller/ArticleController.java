@@ -1,8 +1,10 @@
 package az.gdg.msarticle.controller;
 
+import az.gdg.msarticle.model.ArticleRequest;
 import az.gdg.msarticle.model.dto.ArticleDTO;
 import az.gdg.msarticle.model.dto.UserArticleDTO;
 import az.gdg.msarticle.service.ArticleService;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,14 +22,25 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/articles")
+@Api("Article Controller")
+@RequestMapping("/article")
 @CrossOrigin(exposedHeaders = "Access-Control-Allow-Origin")
 public class ArticleController {
+
     private static final Logger logger = LoggerFactory.getLogger(ArticleController.class);
     private final ArticleService articleService;
 
     public ArticleController(ArticleService articleService) {
         this.articleService = articleService;
+    }
+
+    @PostMapping(value = "/add-draft")
+    @ApiOperation("add draft article to database")
+    public String addDraft(@RequestBody ArticleRequest articleRequest,
+                           @RequestHeader("X-Auth-Token") String token) {
+
+        logger.debug("addDraft start");
+        return articleService.addDraft(token, articleRequest);
     }
 
     @GetMapping("/{articleId}")

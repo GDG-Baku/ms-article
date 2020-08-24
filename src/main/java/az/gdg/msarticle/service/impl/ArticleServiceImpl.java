@@ -9,6 +9,7 @@ import az.gdg.msarticle.exception.NoSuchArticleException;
 import az.gdg.msarticle.exception.UnauthorizedAccessException;
 import az.gdg.msarticle.mapper.ArticleMapper;
 import az.gdg.msarticle.mapper.CommentMapper;
+import az.gdg.msarticle.model.ArticleRequest;
 import az.gdg.msarticle.model.dto.ArticleDTO;
 import az.gdg.msarticle.model.dto.CommentDTO;
 import az.gdg.msarticle.model.dto.UserArticleDTO;
@@ -20,8 +21,11 @@ import az.gdg.msarticle.repository.CommentRepository;
 import az.gdg.msarticle.service.ArticleService;
 import az.gdg.msarticle.service.MailService;
 import az.gdg.msarticle.service.MsAuthService;
+import az.gdg.msarticle.service.TagService;
 import az.gdg.msarticle.util.AuthUtil;
 import az.gdg.msarticle.util.MailUtil;
+import java.util.Collections;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest;
@@ -29,29 +33,61 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service
 public class ArticleServiceImpl implements ArticleService {
     private static final Logger logger = LoggerFactory.getLogger(ArticleServiceImpl.class);
+    private static final String UNAUTHORIZED_ACCESS_EXCEPTION_MESSAGE = "Thrown.UnauthorizedAccessException";
     private final ArticleRepository articleRepository;
     private final MsAuthService msAuthService;
     private final CommentRepository commentRepository;
     private final MailService mailService;
     private final TeamClient teamClient;
+    private final TagService tagService;
 
     public ArticleServiceImpl(ArticleRepository articleRepository,
                               MsAuthService msAuthService,
                               CommentRepository commentRepository,
                               MailService mailService,
-                              TeamClient teamClient) {
+                              TeamClient teamClient,
+                              TagService tagService) {
         this.articleRepository = articleRepository;
         this.msAuthService = msAuthService;
         this.commentRepository = commentRepository;
         this.mailService = mailService;
         this.teamClient = teamClient;
+        this.tagService = tagService;
     }
 
+
+    @Override
+    public String addDraft(String token, ArticleRequest articleRequest) {
+        logger.info("ServiceLog.addDraft.start");
+        Long userId = Long.parseLong((String) AuthUtil.getAuthenticatedObject().getPrincipal());
+
+        ArticleEntity draft = ArticleMapper.INSTANCE.requestToEntity(articleRequest);
+        draft.setUserId(userId);
+        draft.setDraft(true);
+        draft.setReadCount(0);
+        draft.setHateCount(0);
+        draft.setQuackCount(0);
+        draft.setApproved(false);
+        draft.setApproverId(null);
+        draft.setComments(Collections.emptyList());
+
+        if (articleRequest.getType().equals("NEWS")) {
+            draft.setTags(Collections.emptyList());
+        } else {
+            draft.setTags(tagService.getTagsFromRequest(articleRequest.getTags()));
+        }
+
+        articleRepository.save(draft);
+
+        logger.info("ServiceLog.addDraft.stop.success");
+
+        return draft.getId();
+
+
+    }
 
     @Override
     public void addReadCount(String articleId) {
@@ -76,13 +112,13 @@ public class ArticleServiceImpl implements ArticleService {
                 .orElseThrow(() -> new NoSuchArticleException("Article doesn't exist"));
         Long articleUserId = articleEntity.getUserId();
         if (articleUserId.equals(userId)) {
-            if (articleEntity.getComments() != null
-                    && !articleEntity.getComments().isEmpty()) {
+            if (articleEntity.getComments() != null &&
+                    !articleEntity.getComments().isEmpty()) {
                 deleteAllComments(articleEntity.getComments());
             }
             articleRepository.deleteById(articleID);
         } else {
-            logger.info("Thrown.UnauthorizedAccessException");
+            logger.info(UNAUTHORIZED_ACCESS_EXCEPTION_MESSAGE);
             throw new UnauthorizedAccessException("You don't have permission to delete the article");
         }
     }
@@ -104,11 +140,11 @@ public class ArticleServiceImpl implements ArticleService {
         if (articleEntity.isDraft()) {
             try {
                 if (Long.parseLong(AuthUtil.getAuthenticatedObject().getPrincipal().toString()) != userId) {
-                    logger.error("Thrown.UnauthorizedAccessException");
+                    logger.error(UNAUTHORIZED_ACCESS_EXCEPTION_MESSAGE);
                     throw new UnauthorizedAccessException("You don't have permission to get the article");
                 }
             } catch (InvalidTokenException e) {
-                logger.error("Thrown.UnauthorizedAccessException");
+                logger.error(UNAUTHORIZED_ACCESS_EXCEPTION_MESSAGE, e);
                 throw new UnauthorizedAccessException("You don't have permission to get the article");
             }
         }
