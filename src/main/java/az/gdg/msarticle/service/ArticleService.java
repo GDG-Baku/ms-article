@@ -18,4 +18,6 @@ public interface ArticleService {
 
     String addDraft(String token, ArticleRequest articleRequest);
 
+    void addQuackByArticleId(String articleId, String token);
+
 }

@@ -81,4 +81,12 @@ public class ArticleController {
         logger.debug("Get articles by userId {} start", userId);
         return articleService.getArticlesByUserId(userId, page);
     }
+
+    @ApiOperation("Add Quack")
+    @PutMapping("/addQuack/{articleId}")
+    public void addQuackByArticleId(@RequestHeader("X-Auth-Token") String token,
+                                    @PathVariable("articleId") String articleId) {
+        logger.debug("add quack by articleId {} start", articleId);
+        articleService.addQuackByArticleId(articleId, token);
+    }
 }
