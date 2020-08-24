@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.RestController;
 @CrossOrigin(exposedHeaders = "Access-Control-Allow-Origin")
 public class CommentController {
     private static final Logger logger = LoggerFactory.getLogger(CommentController.class);
-
     private final CommentService commentService;
 
     public CommentController(CommentService commentService) {

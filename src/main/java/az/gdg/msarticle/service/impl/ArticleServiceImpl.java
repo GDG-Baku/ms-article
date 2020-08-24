@@ -36,6 +36,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class ArticleServiceImpl implements ArticleService {
     private static final Logger logger = LoggerFactory.getLogger(ArticleServiceImpl.class);
+    private static final String UNAUTHORIZED_ACCESS_EXCEPTION_MESSAGE = "Thrown.UnauthorizedAccessException";
     private final ArticleRepository articleRepository;
     private final MsAuthService msAuthService;
     private final CommentRepository commentRepository;
@@ -117,7 +118,7 @@ public class ArticleServiceImpl implements ArticleService {
             }
             articleRepository.deleteById(articleID);
         } else {
-            logger.info("Thrown.UnauthorizedAccessException");
+            logger.info(UNAUTHORIZED_ACCESS_EXCEPTION_MESSAGE);
             throw new UnauthorizedAccessException("You don't have permission to delete the article");
         }
     }
@@ -139,11 +140,11 @@ public class ArticleServiceImpl implements ArticleService {
         if (articleEntity.isDraft()) {
             try {
                 if (Long.parseLong(AuthUtil.getAuthenticatedObject().getPrincipal().toString()) != userId) {
-                    logger.error("Thrown.UnauthorizedAccessException");
+                    logger.error(UNAUTHORIZED_ACCESS_EXCEPTION_MESSAGE);
                     throw new UnauthorizedAccessException("You don't have permission to get the article");
                 }
             } catch (InvalidTokenException e) {
-                logger.error("Thrown.UnauthorizedAccessException");
+                logger.error(UNAUTHORIZED_ACCESS_EXCEPTION_MESSAGE, e);
                 throw new UnauthorizedAccessException("You don't have permission to get the article");
             }
         }

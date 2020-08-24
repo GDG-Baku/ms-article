@@ -6,7 +6,6 @@ import az.gdg.msarticle.model.dto.UserArticleDTO;
 import az.gdg.msarticle.service.ArticleService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -26,11 +25,14 @@ import org.springframework.web.bind.annotation.RestController;
 @Api("Article Controller")
 @RequestMapping("/article")
 @CrossOrigin(exposedHeaders = "Access-Control-Allow-Origin")
-@RequiredArgsConstructor
 public class ArticleController {
 
     private static final Logger logger = LoggerFactory.getLogger(ArticleController.class);
     private final ArticleService articleService;
+
+    public ArticleController(ArticleService articleService) {
+        this.articleService = articleService;
+    }
 
     @PostMapping(value = "/add-draft")
     @ApiOperation("add draft article to database")
