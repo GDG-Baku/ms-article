@@ -26,4 +26,4 @@ swagger:
 client:
   service:
     url:
-      ms-auth: ${CLIENT_SERVICE_URL_MS-AUTH:http://localhost:8081}
+      ms-auth: ${CLIENT_SERVICE_URL_MS-AUTH}
