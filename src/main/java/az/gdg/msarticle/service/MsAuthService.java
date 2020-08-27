@@ -22,4 +22,14 @@ public interface MsAuthService {
 
     @PutMapping("/user/popularity/{userId}")
     void addPopularity(@PathVariable("userId") Long userId);
+
+    @GetMapping("/user/get-remaining-quack-count")
+    Integer getRemainingQuackCount(
+            @RequestHeader(X_AUTH_TOKEN) String token
+    );
+
+    @PutMapping("/user/update-remaining-quack-count")
+    void updateRemainingQuackCount(
+            @RequestHeader(X_AUTH_TOKEN) String token
+    );
 }

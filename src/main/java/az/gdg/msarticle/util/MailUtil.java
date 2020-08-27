@@ -1,7 +1,6 @@
 package az.gdg.msarticle.util;
 
 import az.gdg.msarticle.model.client.mail.MailDTO;
-
 import java.util.List;
 
 public class MailUtil {
