@@ -425,15 +425,29 @@ class ArticleServiceImplTest extends Specification {
                     hateCount: 5, readCount: 75, isDraft: false, isApproved: true, approverId: 41, tags: [tag], comments: [comment])
             def userAuthentication = new UserAuthentication("41", true)
             SecurityContextHolder.getContext().setAuthentication(userAuthentication)
-        
+    
         when:
             articleServiceImpl.addQuackByArticleId(articleId, token)
-        
+    
         then:
             1 * articleRepository.findById(articleId) >> Optional.of(articleEntity)
             1 * msAuthService.getRemainingQuackCount(token) >> remainingQuackCount
             thrown(UnauthorizedAccessException)
     }
+    
+    def "should throw NoSuchArticleException if no such article when call addQuackByArticleId"() {
+        given:
+            def articleId = "dasdpksapdksaop"
+            def token = "dsad"
+        
+        when:
+            articleServiceImpl.addQuackByArticleId(articleId, token)
+        
+        then:
+            1 * articleRepository.findById(articleId) >> Optional.empty()
+            thrown(NoSuchArticleException)
+    }
+    
     
     def "should throw ExceedLimitException if all quacks were used"() {
         given:
@@ -454,6 +468,79 @@ class ArticleServiceImplTest extends Specification {
         then:
             1 * articleRepository.findById(articleId) >> Optional.of(articleEntity)
             1 * msAuthService.getRemainingQuackCount(token) >> remainingQuackCount
+            thrown(ExceedLimitException)
+    }
+    
+    def "should use the repository to add article hateCount by id"() {
+        given:
+            def articleId = "5eac708be7179a42f172de4c"
+            def token = "wdasadadada"
+            def tag = new TagEntity()
+            def comment = new CommentEntity()
+            def remainingHateCount = 500
+            def articleEntity = new ArticleEntity(id: "5eac708be7179a42f172de4c", userId: 41, title: "Test Title",
+                    content: "Code Block", createdAt: LocalDateTime.now(), updatedAt: LocalDateTime.now(), quackCount: 30,
+                    hateCount: 5, readCount: 75, isDraft: false, isApproved: true, approverId: 41, tags: [tag], comments: [comment])
+            def userAuthentication = new UserAuthentication("15", true)
+            SecurityContextHolder.getContext().setAuthentication(userAuthentication)
+        
+        when:
+            articleServiceImpl.addHateByArticleId(articleId, token)
+        
+        then:
+            1 * articleRepository.findById(articleId) >> Optional.of(articleEntity)
+            1 * msAuthService.getRemainingHateCount(token) >> remainingHateCount
+            1 * articleRepository.save(articleEntity)
+            1 * msAuthService.updateRemainingHateCount(token)
+            articleEntity.hateCount == 6
+    }
+    
+    def "should throw NoSuchArticleException if no such article when call addHateByArticleId"() {
+        given:
+            def articleId = "dasdpksapdksaop"
+            def token = "dsad"
+        
+        when:
+            articleServiceImpl.addHateByArticleId(articleId, token)
+        
+        then:
+            1 * articleRepository.findById(articleId) >> Optional.empty()
+            thrown(NoSuchArticleException)
+    }
+    
+    def "should throw InvalidTokenException if not logged when call addHateByArticleId"() {
+        given:
+            def articleId = "5eac708be7179a42f172de4c"
+            def token = "wdasadadada"
+            def userAuthentication = null
+            SecurityContextHolder.getContext().setAuthentication(userAuthentication)
+        
+        when:
+            articleServiceImpl.addHateByArticleId(articleId, token)
+        
+        then:
+            thrown(InvalidTokenException)
+    }
+    
+    def "should throw ExceedLimitException if all hates were used"() {
+        given:
+            def articleId = "5eac708be7179a42f172de4c"
+            def token = "wdasadadada"
+            def tag = new TagEntity()
+            def comment = new CommentEntity()
+            def remainingHateCount = 0
+            def articleEntity = new ArticleEntity(id: "5eac708be7179a42f172de4c", userId: 41, title: "Test Title",
+                    content: "Code Block", createdAt: LocalDateTime.now(), updatedAt: LocalDateTime.now(), quackCount: 30,
+                    hateCount: 5, readCount: 75, isDraft: false, isApproved: true, approverId: 41, tags: [tag], comments: [comment])
+            def userAuthentication = new UserAuthentication("10", true)
+            SecurityContextHolder.getContext().setAuthentication(userAuthentication)
+        
+        when:
+            articleServiceImpl.addHateByArticleId(articleId, token)
+        
+        then:
+            1 * articleRepository.findById(articleId) >> Optional.of(articleEntity)
+            1 * msAuthService.getRemainingHateCount(token) >> remainingHateCount
             thrown(ExceedLimitException)
     }
 }
