@@ -1,15 +1,19 @@
 package az.gdg.msarticle.repository;
 
 import az.gdg.msarticle.model.entity.ArticleEntity;
+import az.gdg.msarticle.model.entity.CommentEntity;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
-
-import java.util.List;
 
 @Repository
 public interface ArticleRepository extends MongoRepository<ArticleEntity, String> {
 
-    List<ArticleEntity> getArticleEntitiesByUserId(Integer userId);
+    Page<ArticleEntity> getArticleEntitiesByUserId(Long userId, Pageable pageable);
 
-    List<ArticleEntity> getArticleEntitiesByUserIdAndIsDraft(Integer userId, boolean isDraft);
+    Page<ArticleEntity> getArticleEntitiesByUserIdAndIsDraftFalseAndIsApprovedTrue(Long userId, Pageable pageable);
+
+    ArticleEntity findByCommentsContains(CommentEntity commentEntity);
 }

@@ -1,4 +1,4 @@
-package az.gdg.msarticle.model.dto;
+package az.gdg.msarticle.model.client.mail;
 
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -7,10 +7,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserArticleDTO {
-    private UserDTO userDTO;
-    private List<ArticleDTO> articleDTOs;
+@Builder
+public class MailDTO {
+    private List<String> to;
+    private String subject;
+    private String body;
 }
