@@ -20,4 +20,6 @@ public interface ArticleService {
 
     void addQuackByArticleId(String articleId, String token);
 
+    void addHateByArticleId(String articleId, String token);
+
 }

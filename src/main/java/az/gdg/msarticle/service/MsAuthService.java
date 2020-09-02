@@ -32,4 +32,14 @@ public interface MsAuthService {
     void updateRemainingQuackCount(
             @RequestHeader(X_AUTH_TOKEN) String token
     );
+
+    @GetMapping("/user/get-remaining-hate-count")
+    Integer getRemainingHateCount(
+            @RequestHeader(X_AUTH_TOKEN) String token
+    );
+
+    @PutMapping("/user/update-remaining-hate-count")
+    void updateRemainingHateCount(
+            @RequestHeader(X_AUTH_TOKEN) String token
+    );
 }

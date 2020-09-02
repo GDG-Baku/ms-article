@@ -25,16 +25,15 @@ import az.gdg.msarticle.service.MsAuthService;
 import az.gdg.msarticle.service.TagService;
 import az.gdg.msarticle.util.AuthUtil;
 import az.gdg.msarticle.util.MailUtil;
-
-import java.util.Collections;
-import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+
+import java.util.Collections;
+import java.util.List;
 
 @Service
 public class ArticleServiceImpl implements ArticleService {
@@ -256,4 +255,25 @@ public class ArticleServiceImpl implements ArticleService {
         }
     }
 
+    public void addHateByArticleId(String articleID, String token) {
+        logger.info("ActionLog.addHateByArticleId.start");
+        Long userId = Long.parseLong((String) AuthUtil.getAuthenticatedObject().getPrincipal());
+        ArticleEntity articleEntity = articleRepository.findById(articleID)
+                .orElseThrow(() -> new NoSuchArticleException("Article doesn't exist"));
+        Long articleUserId = articleEntity.getUserId();
+        Integer remainingQuackCount = msAuthService.getRemainingHateCount(token);
+        if (!articleUserId.equals(userId) && AuthUtil.getAuthenticatedObject().isAuthenticated()) {
+            if (remainingQuackCount > 0) {
+                articleEntity.setHateCount(articleEntity.getHateCount() + 1);
+                articleRepository.save(articleEntity);
+                msAuthService.updateRemainingHateCount(token);
+            } else {
+                logger.error("Thrown.ExceedLimitException");
+                throw new ExceedLimitException("You've already used your daily hates");
+            }
+        } else {
+            logger.error("Thrown.UnauthorizedAccessException");
+            throw new UnauthorizedAccessException("You don't have access to hate");
+        }
+    }
 }

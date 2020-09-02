@@ -89,4 +89,12 @@ public class ArticleController {
         logger.debug("add quack by articleId {} start", articleId);
         articleService.addQuackByArticleId(articleId, token);
     }
+
+    @ApiOperation("Add Hate")
+    @PutMapping("/addHate/{articleId}")
+    public void addHateByArticleId(@RequestHeader("X-Auth-Token") String token,
+                                    @PathVariable("articleId") String articleId) {
+        logger.debug("add hate by articleId {} start", articleId);
+        articleService.addHateByArticleId(articleId, token);
+    }
 }
